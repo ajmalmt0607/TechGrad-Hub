@@ -1,0 +1,11 @@
+# Ignore .env files
+.env
+
+# Ignore virtual environment directory
+venv/
+venv
+
+# Ignore other sensitive files or directories
+*.pyc
+__pycache__/
+db.sqlite3

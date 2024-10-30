@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+
+# Node.js
+node_modules/
+.DS_Store
+
+# Build files
+build/
+dist/
+
+# Logs
+*.log
+
+# Ignore virtual environment directory
+venv/
+venv
