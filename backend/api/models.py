@@ -48,6 +48,14 @@ RATING = (
     (5, "5 Star"),
 )
 
+NOTI_TYPE = (
+    ("New Order", "New Order"),
+    ("New Review", "New Review"),
+    ("New Course Question", "New Course Question"),
+    ("Draft", "Draft"),
+    ("Course Published", "Course Published"),
+)
+
 class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.FileField(upload_to="course-file", blank=True, null=True, default="default.jpg")
@@ -101,10 +109,10 @@ class Course(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    language = models.CharField(choices=LANGUAGE, default="English")
-    level = models.CharField(choices=LEVEL, default="Beginner")
-    platform_status = models.CharField(choices=PLATFORM_STATUS, default="Published")
-    teacher_course_status = models.CharField(choices=TEACHER_STATUS, default="Published")
+    language = models.CharField(choices=LANGUAGE, default="English", max_length=100)
+    level = models.CharField(choices=LEVEL, default="Beginner", max_length=100)
+    platform_status = models.CharField(choices=PLATFORM_STATUS, default="Published", max_length=100)
+    teacher_course_status = models.CharField(choices=TEACHER_STATUS, default="Published", max_length=100)
     featured = models.BooleanField(default=False)
     course_id = ShortUUIDField(unique=True, length=6, max_length=20, alphabet="1234567890")
     slug = models.SlugField(unique=True, null=True, blank=True)
@@ -144,7 +152,7 @@ class Course(models.Model):
 class Variant(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=1000)
-    variant_id = ShortUUIDField(unique=True, Length=6, max_length=20, alphabet="1234567890")
+    variant_id = ShortUUIDField(unique=True, length=6, max_length=20, alphabet="1234567890")
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -161,7 +169,7 @@ class VariantItem(models.Model):
     duration = models.DurationField(null=True, blank=True)
     content_duration = models.CharField(max_length=1000, null=True, blank=True)
     preview = models.BooleanField(default=False)
-    variant_item_id = ShortUUIDField(unique=True, Length=6, max_length=20, alphabet="1234567890")
+    variant_item_id = ShortUUIDField(unique=True, length=6, max_length=20, alphabet="1234567890")
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -245,7 +253,7 @@ class CartOrder(models.Model):
     total = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     initial_total = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     saved = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
-    payment_status = models.CharField(choices=PAYMENT_STATUS, default="Processing")
+    payment_status = models.CharField(choices=PAYMENT_STATUS, default="Processing", max_length=100)
     full_name = models.CharField(max_length=100, null=True, blank=True)
     email = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=100, null=True, blank=True)
@@ -382,4 +390,35 @@ class Notification(models.Model):
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.type   
+        return self.type
+
+
+class Coupon(models.Model):
+    teacher = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, blank=True)
+    used_by = models.ManyToManyField(User, blank=True)
+    code = models.CharField(max_length=50)
+    discount = models.IntegerField(default=1)
+    active = models.BooleanField(default=False)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.code
+    
+
+class Whishlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.course.title
+    
+
+class Country(models.Model):
+    name = models.CharField(max_length=100)
+    tax_rate = models.IntegerField(default=5)
+    active = models.BooleanField(default=True) 
+
+    def __str__(self):
+        return self.name
+
+
