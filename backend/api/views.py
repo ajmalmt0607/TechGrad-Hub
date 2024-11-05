@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 
 from api import serializer as api_serializer
+from api import models as api_models
 from userauths.models import User, Profile
 
 from rest_framework_simplejwt.views import TokenObtainPairView

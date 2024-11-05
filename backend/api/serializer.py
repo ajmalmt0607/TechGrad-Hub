@@ -1,4 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
+from api import models as api_models
 
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -52,3 +53,136 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.Category
+        fields = ['title', 'image', 'slug', 'course_count']
+
+class TeacherSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.Teacher
+        fields = ["user","image", "full_name", "bio", "facebook","twitter","linkedin","about","country","students","courses","review",]
+
+
+class VariantItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.VariantItem
+        fields = "__all__"
+
+class VariantSerializer(serializers.ModelSerializer):
+    variant_items = VariantItemSerializer()
+
+    class Meta:
+        model = api_models.Variant
+        fields = "__all__"
+
+
+class Question_Answer_MessageSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(many=False)
+    
+    class Meta:
+        model = api_models.Question_Answer_Message
+        fields = "__all__"
+
+class Question_AnswerSerializer(serializers.ModelSerializer):
+    messages = Question_Answer_MessageSerializer(many=True)
+    profile = ProfileSerializer(many=False)
+
+    class Meta:
+        model = api_models.Question_Answer
+        fields = "__all__"
+
+class CartSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.Cart
+        fields = "__all__"
+
+class CartOrderItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.CartOrderItem
+        fields = "__all__"
+
+class CartOrderSerializer(serializers.ModelSerializer):
+    order_items = CartOrderItemSerializer(many=True)
+
+    class Meta:
+        model = api_models.CartOrder
+        fields = "__all__"
+
+class CertificateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.Certificate
+        fields = "__all__"
+
+class CompletedLessonSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.CompletedLesson
+        fields = "__all__"
+
+
+class NoteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.Note
+        fields = "__all__"
+
+class ReviewSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(many=False)
+
+    class Meta:
+        model = api_models.Review
+        fields = "__all__"
+
+class NotificationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.Notification
+        fields = "__all__"
+
+class CouponSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.Coupon
+        fields = "__all__"
+
+class WhishlistSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.Whishlist
+        fields = "__all__"
+
+class CountrySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = api_models.Country
+        fields = "__all__"
+
+class EnrolledCourseSerializer(serializers.ModelSerializer):
+    lectures = VariantItemSerializer(many=True, read_only=True)
+    completed_lesson = CompletedLessonSerializer(many=True, read_only=True)
+    curriculum = VariantItemSerializer(many=True, read_only=True)
+    note = NoteSerializer(many=True, read_only=True)
+    question_answer = Question_AnswerSerializer(many=True, read_only=True)
+    review = ReviewSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = api_models.EnrolledCourse
+        fields = "__all__"
+
+class CourseSerializer(serializers.ModelSerializer):
+    # many=True means EnrolledCourse has many students
+    students = EnrolledCourseSerializer(many=True)
+    curriculum = VariantItemSerializer(many=True)
+    lectures = VariantItemSerializer(many=True)
+
+    class Meta:
+        model = api_models.Course
+        fields = ["category","teacher","file","image","title","description","price","language","level","platform_status","teacher_course_status","featured","course_id","slug","date","students","curriculum","lectures","students","curriculum","lectures","average_rating","rating_count","reviews",]

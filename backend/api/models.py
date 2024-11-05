@@ -79,7 +79,6 @@ class Teacher(models.Model):
     def review(self):
         return Course.objects.filter(teacher=self).count()
 
-
 class Category(models.Model):
     title = models.CharField(max_length=100)
     image  = models.FileField(upload_to="course-file", default="category.jpg", null=True, blank=True)
@@ -141,14 +140,14 @@ class Course(models.Model):
         # models.Avg('rating') is a Django aggregation function that calculates the average value of the rating field for all reviews returned by the filter
         # The result will be a dictionary where the key is avg_rating, and the value is the calculated average. {'avg_rating': 4.0}
         average_rating = Review.objects.filter(course=self, active=True).aggregate(avg_rating=models.Avg('rating'))
+        return average_rating['avg_rating']
 
     def rating_count(self):
         return Review.objects.filter(course=self, active=True).count()
     
     def reviews(self):
         return Review.objects.filter(course=self, active=True)
-    
-
+        
 class Variant(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=1000)
@@ -193,7 +192,6 @@ class VariantItem(models.Model):
             # Here we saying updated field 'content_duration' update during save
             super().save(update_fields=['content_duration'])
 
-
 class Question_Answer(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -231,7 +229,6 @@ class Question_Answer_Message(models.Model):
     def profile(self):
         return Profile.objects.get(user=self.user)
     
-
 class Cart(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)    
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -303,7 +300,6 @@ class CartOrderItem(models.Model):
     def __str__(self):
         return self.oid
     
-
 class Certificate(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -352,7 +348,6 @@ class EnrolledCourse(models.Model):
     def review(self):
         return Review.objects.filter(course=self.course, user=self.user).first()
 
-
 class Note(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -392,7 +387,6 @@ class Notification(models.Model):
     def __str__(self):
         return self.type
 
-
 class Coupon(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, blank=True)
     used_by = models.ManyToManyField(User, blank=True)
@@ -404,7 +398,6 @@ class Coupon(models.Model):
     def __str__(self):
         return self.code
     
-
 class Whishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -412,7 +405,6 @@ class Whishlist(models.Model):
     def __str__(self):
         return self.course.title
     
-
 class Country(models.Model):
     name = models.CharField(max_length=100)
     tax_rate = models.IntegerField(default=5)
