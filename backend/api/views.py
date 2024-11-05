@@ -100,3 +100,8 @@ class PasswordChangeAPIView(generics.CreateAPIView):
             return Response({"message": "Password changed successfully"},status=status.HTTP_201_CREATED)
         else:
             return Response({"message": "User Does Not Exist"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CategoryListAPIView(generics.ListAPIView):
+    # when evere we use the ListAPIView we need to know that we try to retrieve a list of items from the database
+    queryset = api_models.Category.objects.all()
