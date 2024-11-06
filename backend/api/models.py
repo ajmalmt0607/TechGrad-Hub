@@ -124,7 +124,7 @@ class Course(models.Model):
     def save(self, *args, **kwargs):# rewriting default save method
         if self.slug == "" or self.slug == None:
             self.slug = slugify(self.title)
-        super(Category, self).save(*args, **kwargs)
+        super(Course, self).save(*args, **kwargs)
 
     def students(self):
         return EnrolledCourse.objects.filter(course=self)
@@ -237,7 +237,7 @@ class Cart(models.Model):
     tax_fee = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     total = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     country = models.CharField(max_length=100, null=True, blank=True)
-    cart_id = ShortUUIDField(unique=True, length=6, max_length=20, alphabet="1234567890")
+    cart_id = ShortUUIDField(length=6, max_length=20, alphabet="1234567890")
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -245,7 +245,7 @@ class Cart(models.Model):
     
 class CartOrder(models.Model):
     student = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    teacher = models.ManyToManyField(Teacher, blank=True)
+    teachers = models.ManyToManyField(Teacher, blank=True)
     sub_total = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     tax_fee = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     total = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
@@ -278,6 +278,7 @@ class CartOrderItem(models.Model):
     order = models.ForeignKey(CartOrder, on_delete=models.CASCADE, related_name="orderitem")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="order_item")
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=12, default=0.00, decimal_places=2) 
     tax_fee = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     total = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     initial_total = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
