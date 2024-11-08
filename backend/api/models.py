@@ -54,6 +54,7 @@ NOTI_TYPE = (
     ("New Course Question", "New Course Question"),
     ("Draft", "Draft"),
     ("Course Published", "Course Published"),
+    ("Course Enrollment Completed", "Course Enrollment Completed"),
 )
 
 class Teacher(models.Model):
@@ -283,7 +284,7 @@ class CartOrderItem(models.Model):
     total = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     initial_total = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
     saved = models.DecimalField(max_digits=12, default=0.00, decimal_places=2)
-    coupons = models.ForeignKey("api.Coupon", on_delete=models.SET_NULL, null=True, blank=True)
+    coupons = models.ManyToManyField("api.Coupon", blank= True)
     applied_coupon = models.BooleanField(default=False)
     oid = ShortUUIDField(unique=True, length=6, max_length=20, alphabet="1234567890")
     date = models.DateTimeField(default=timezone.now)

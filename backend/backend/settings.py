@@ -163,6 +163,7 @@ AUTH_USER_MODEL = 'userauths.User'
 # EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
 # Email settings
+
 EMAIL_BACKEND = config('EMAIL_BACKEND')
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
@@ -171,6 +172,16 @@ EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+
+# STRIPE PAYMENT
+
+STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")
+FRONTEND_SITE_URL = env("FRONTEND_SITE_URL")
+BACKEND_SITE_URL = env("BACKEND_SITE_URL")
+
+# PAYPAL PAYMENT
+PAYPAL_CLIENT_ID = env("PAYPAL_CLIENT_ID")
+PAYPAL_SECRET_ID = env("PAYPAL_SECRET_ID")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
