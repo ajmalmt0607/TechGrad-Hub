@@ -140,7 +140,7 @@ class CourseDetailAPIView(generics.RetrieveAPIView):
     
 
 class CartAPIView(generics.CreateAPIView):
-    # CartAPIView is a Django REST Framework API view that allows users to create or update items in a cart.
+    # CartAPIView is a Django REST Framework API view that allows users to add, create or update items in a cart.
     # when evere we use the CreateAPIView we need to know that we try to create a new item in the database
     queryset = api_models.Cart.objects.all()
     serializer_class = api_serializer.CartSerializer
@@ -176,7 +176,7 @@ class CartAPIView(generics.CreateAPIView):
             tax_rate = 0
 
         # Check if Cart Exists
-        cart = api_models.Cart.objects.filter(cart_id=cart_id, course=course)
+        cart = api_models.Cart.objects.filter(cart_id=cart_id, course=course).first()
 
         # Update or Create the Cart
         if cart:

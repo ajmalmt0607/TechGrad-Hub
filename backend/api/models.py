@@ -131,7 +131,7 @@ class Course(models.Model):
         return EnrolledCourse.objects.filter(course=self)
     
     def curriculum(self):
-        return VariantItem.objects.filter(variant__course=self)
+        return Variant.objects.filter(course=self)
     
     def lectures(self):
         # Get the variant related to the VariantItem. and Then get the course associated with that variant.
@@ -166,7 +166,7 @@ class VariantItem(models.Model):
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name="variant_items")
     title = models.CharField(max_length=1000)
     description = models.TextField(null=True, blank=True)
-    file = models.FileField(upload_to="course-file")
+    file = models.FileField(upload_to="course-file", null=True, blank=True)
     duration = models.DurationField(null=True, blank=True)
     content_duration = models.CharField(max_length=1000, null=True, blank=True)
     preview = models.BooleanField(default=False)

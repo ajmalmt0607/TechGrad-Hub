@@ -74,7 +74,7 @@ class VariantItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class VariantSerializer(serializers.ModelSerializer):
-    variant_items = VariantItemSerializer()
+    variant_items = VariantItemSerializer(many=True)
 
     class Meta:
         model = api_models.Variant
@@ -177,12 +177,29 @@ class EnrolledCourseSerializer(serializers.ModelSerializer):
         model = api_models.EnrolledCourse
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        super(EnrolledCourseSerializer, self ).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
+
 class CourseSerializer(serializers.ModelSerializer):
     # many=True means EnrolledCourse has many students
     students = EnrolledCourseSerializer(many=True)
-    curriculum = VariantItemSerializer(many=True)
+    curriculum = VariantSerializer(many=True)
     lectures = VariantItemSerializer(many=True)
+    reviews = ReviewSerializer(many=True) # But we can't go depth so in api result we didnt get data
 
     class Meta:
         model = api_models.Course
-        fields = ["category","teacher","file","image","title","description","price","language","level","platform_status","teacher_course_status","featured","course_id","slug","date","students","curriculum","lectures","students","curriculum","lectures","average_rating","rating_count","reviews",]
+        fields = ["id","category","teacher","file","image","title","description","price","language","level","platform_status","teacher_course_status","featured","course_id","slug","date","students","curriculum","lectures","students","curriculum","lectures","average_rating","rating_count","reviews",]
+
+    def __init__(self, *args, **kwargs):
+        super(CourseSerializer, self ).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
