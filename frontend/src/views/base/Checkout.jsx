@@ -307,22 +307,27 @@ import apiInstance from "../../utils/axios";
 import CartId from "../plugins/CartId";
 import Toast from "../plugins/Toast";
 import { CartContext } from "../plugins/Context";
-import { userId } from "../../utils/constants";
+import { PAYPAL_CLIENT_ID, userId } from "../../utils/constants";
 
 export default function Checkout() {
 	const [order, setOrder] = useState([]);
 	const [coupon, setCoupon] = useState("");
-	const param = useParams([]);
+	const param = useParams();
 
 	const fetchOrder = async () => {
 		try {
 			apiInstance.get(`order/checkout/${param.order_oid}/`).then((res) => {
+				console.log(res.data); // Check if total exists in the response
 				setOrder(res.data);
 			});
 		} catch (error) {
 			console.log(error);
 		}
 	};
+	const paypal_order = order.total;
+	console.log(paypal_order);
+
+	const navigate = useNavigate();
 
 	const applyCoupon = async () => {
 		const formdata = new FormData();
@@ -352,6 +357,7 @@ export default function Checkout() {
 	useEffect(() => {
 		fetchOrder();
 	}, []);
+	console.log(typeof order.total); // Check the type
 
 	const initialOptions = {
 		clientId: PAYPAL_CLIENT_ID,
@@ -558,15 +564,43 @@ export default function Checkout() {
 											className="block w-full bg-indigo-600 text-white text-center py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
 										>
 											<CreditCard className="inline-block mr-2 h-5 w-5" />
-											Pay With PayPal
-										</Link>
-										<Link
-											to="/success/txn_id"
-											className="block w-full bg-indigo-600 text-white text-center py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
-										>
-											<CreditCard className="inline-block mr-2 h-5 w-5" />
 											Pay With Stripe
 										</Link>
+										{/* paypal initialOptions defined top */}
+										<PayPalScriptProvider options={initialOptions}>
+											{order.total !== undefined ? (
+												<PayPalButtons
+													className="mt-3"
+													createOrder={(data, actions) => {
+														return actions.order.create({
+															purchase_units: [
+																{
+																	amount: {
+																		currency_code: "USD",
+																		value: order.total.toString(),
+																	},
+																},
+															],
+														});
+													}}
+													onApprove={(data, actions) => {
+														return actions.order.capture().then((details) => {
+															const name = details.payer.name.given_name;
+															const status = details.status;
+															const paypal_order_id = data.orderID;
+
+															if (status === "COMPLETED") {
+																navigate(
+																	`/payment-success/${order.oid}/?paypal_order_id=${paypal_order_id}`
+																);
+															}
+														});
+													}}
+												/>
+											) : (
+												<p>Loading order...</p>
+											)}
+										</PayPalScriptProvider>
 									</div>
 									<p className="text-xs text-center mt-4 text-gray-500">
 										By proceeding to payment, you agree to these{" "}
