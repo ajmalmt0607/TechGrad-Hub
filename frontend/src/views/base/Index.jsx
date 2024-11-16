@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import {
 	ChevronRight,
@@ -22,6 +22,12 @@ import logo from "../../assets/techgrad.svg";
 import teacher from "../../assets/Best Teacher.png";
 import user from "../../assets/user-1.jpg";
 import BaseHeader from "../partials/BaseHeader";
+import CartId from "../plugins/CartId";
+import GetCurrentAddress from "../plugins/UserCountry";
+import UserData from "../plugins/UserData";
+import Toast from "../plugins/Toast";
+import apiInstance from "../../utils/axios";
+import { CartContext } from "../plugins/Context";
 
 const CourseSkeleton = () => (
 	<div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
@@ -42,6 +48,11 @@ const CourseSkeleton = () => (
 export default function Component() {
 	const [courses, setCourses] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [cartCount, setCartCount] = useContext(CartContext);
+
+	const country = GetCurrentAddress().country;
+	const userId = UserData().user_id;
+	const cartId = CartId();
 
 	const fetchCourse = async () => {
 		setIsLoading(true);
@@ -58,6 +69,32 @@ export default function Component() {
 	useEffect(() => {
 		fetchCourse();
 	}, []);
+
+	const addToCart = async (courseId, userId, price, country, cartId) => {
+		const formdata = new FormData();
+		// first one is the key to send the backend and the second is the key value passing from frontend
+		formdata.append("course_id", courseId);
+		formdata.append("user_id", userId);
+		formdata.append("price", price);
+		formdata.append("country_name", country);
+		formdata.append("cart_id", cartId);
+
+		try {
+			await useAxios()
+				.post(`course/cart/`, formdata)
+				.then((res) => {
+					console.log(res.data);
+					Toast().fire({ icon: "success", title: "Added to Cart" });
+				});
+
+			// set cart count after adding to cart
+			apiInstance.get(`course/cart-list/${CartId()}/`).then((res) => {
+				setCartCount(res.data?.length);
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
 	return (
 		<div className="min-h-screen bg-gray-50">
@@ -147,69 +184,83 @@ export default function Component() {
 						) : (
 							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 								{courses?.slice(0, 8).map((course, index) => (
-									<Link
-										to={`/course-detail/${course.slug}/`}
+									<div
 										key={index}
 										className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 ease-in-out flex flex-col"
 									>
-										<div className="relative">
-											<img
-												src="https://geeksui.codescandy.com/geeks/assets/images/course/course-css.jpg"
-												alt="Course thumbnail"
-												className="w-full h-48 object-cover"
-											/>
-										</div>
-										<div className="p-6 flex flex-col justify-between flex-1">
-											<div className="flex items-center mb-4 space-x-2">
-												<span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-													{course.level}
-												</span>
-												<span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-													{course.language}
-												</span>
+										<Link
+											to={`/course-detail/${course.slug}/`}
+											className="flex-1 flex flex-col"
+										>
+											<div className="relative">
+												<img
+													src="https://geeksui.codescandy.com/geeks/assets/images/course/course-css.jpg"
+													alt="Course thumbnail"
+													className="w-full h-48 object-cover"
+												/>
 											</div>
-
-											<h3 className="font-semibold text-lg mb-3 text-gray-900 line-clamp-2 leading-tight">
-												{course.title}
-											</h3>
-
-											<p className="text-sm text-gray-600 mb-4 flex items-center">
-												<Users size={16} className="mr-2" />
-												By {course.teacher.full_name} •{" "}
-												{course.students?.length} Student
-												{course.students?.length !== 1 && "s"}
-											</p>
-
-											<div className="flex items-center mb-4">
-												<div className="flex items-center mr-2">
-													{[1, 2, 3, 4, 5].map((star) => (
-														<Star
-															key={star}
-															size={16}
-															className={
-																star <= Math.round(course.average_rating)
-																	? "text-yellow-400 fill-current"
-																	: "text-gray-300"
-															}
-														/>
-													))}
+											<div className="p-6 flex flex-col justify-between flex-1">
+												<div className="flex items-center mb-4 space-x-2">
+													<span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+														{course.level}
+													</span>
+													<span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+														{course.language}
+													</span>
 												</div>
-												<span className="text-sm text-gray-600">
-													{course.average_rating?.toFixed(1)} (
-													{course.reviews?.length} reviews)
-												</span>
+												<h3 className="font-semibold text-lg mb-3 text-gray-900 line-clamp-2 leading-tight">
+													{course.title}
+												</h3>
+												<p className="text-sm text-gray-600 mb-4 flex items-center">
+													<Users size={16} className="mr-2" />
+													By {course.teacher.full_name} •{" "}
+													{course.students?.length} Student
+													{course.students?.length !== 1 && "s"}
+												</p>
+												<div className="flex items-center mb-4">
+													<div className="flex items-center mr-2">
+														{[1, 2, 3, 4, 5].map((star) => (
+															<Star
+																key={star}
+																size={16}
+																className={
+																	star <= Math.round(course.average_rating)
+																		? "text-yellow-400 fill-current"
+																		: "text-gray-300"
+																}
+															/>
+														))}
+													</div>
+													<span className="text-sm text-gray-600">
+														{course.average_rating?.toFixed(1)} (
+														{course.reviews?.length} reviews)
+													</span>
+												</div>
 											</div>
-
-											<div className="flex justify-between items-center mt-auto">
-												<span className="font-bold text-2xl text-indigo-600">
-													${course.price}
-												</span>
-												<button className="bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors duration-300 ease-in-out">
-													<ShoppingCart size={20} />
-												</button>
-											</div>
+										</Link>
+										<div className="p-6 pt-0 flex justify-between items-center mt-auto">
+											<span className="font-bold text-2xl text-indigo-600">
+												${course.price}
+											</span>
+											<button
+												className="bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 transition-colors duration-300 ease-in-out"
+												onClick={(e) => {
+													e.stopPropagation(); // Prevent navigation
+													e.preventDefault(); // Ensure the default link click behavior doesn't occur
+													// Call your add-to-cart function here
+													addToCart(
+														course.id,
+														userId,
+														course.price,
+														country,
+														cartId
+													);
+												}}
+											>
+												<ShoppingCart size={20} />
+											</button>
 										</div>
-									</Link>
+									</div>
 								))}
 							</div>
 						)}

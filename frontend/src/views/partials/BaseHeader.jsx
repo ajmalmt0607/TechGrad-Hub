@@ -182,7 +182,7 @@
 
 // export default BaseHeader;
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import {
 	Bell,
@@ -196,8 +196,11 @@ import {
 	DollarSign,
 	Settings,
 } from "lucide-react";
+import { CartContext } from "../plugins/Context";
 
 export default function BaseHeader() {
+	const [cartCount, setCartCount] = useContext(CartContext);
+
 	const [openDropdown, setOpenDropdown] = useState(null);
 
 	const toggleDropdown = (dropdownName) => {
@@ -386,6 +389,11 @@ export default function BaseHeader() {
 								className="p-2 text-gray-600 hover:bg-gray-100 rounded-full dropdown-toggle"
 							>
 								<ShoppingCart className="h-5 w-5" />
+								{cartCount > 0 && (
+									<span className="absolute top-0 right-0 inline-block w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full flex items-center justify-center">
+										{cartCount}
+									</span>
+								)}
 							</button>
 							{openDropdown === "cart" && (
 								<div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">

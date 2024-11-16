@@ -1791,7 +1791,7 @@
 
 // export default CourseDetail;
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import {
 	Play,
@@ -1806,14 +1806,23 @@ import useAxios from "../../utils/useAxios";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import BaseHeader from "../partials/BaseHeader";
+import CartId from "../plugins/CartId";
+import GetCurrentAddress from "../plugins/UserCountry";
+import UserData from "../plugins/UserData";
+import Toast from "../plugins/Toast";
+import { CartContext } from "../plugins/Context";
+import apiInstance from "../../utils/axios";
 
 export default function CourseDetail() {
 	const [course, setCourse] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [addToCartBtn, setAddToCartBtn] = useState("Add to Cart");
+	const [cartCount, setCartCount] = useContext(CartContext);
 
 	const param = useParams();
-	console.log(param.slug);
+
+	const country = GetCurrentAddress().country;
+	const userId = UserData().user_id;
 
 	const [activeTab, setActiveTab] = useState("overview");
 	const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -1849,7 +1858,13 @@ export default function CourseDetail() {
 				.then((res) => {
 					console.log(res.data);
 					setAddToCartBtn("Added to Cart");
+					Toast().fire({ icon: "success", title: "Added to Cart" });
 				});
+
+			// set cart count after adding to cart
+			apiInstance.get(`course/cart-list/${CartId()}/`).then((res) => {
+				setCartCount(res.data?.length);
+			});
 		} catch (error) {
 			console.log(error);
 			setAddToCartBtn("Add to Cart");
@@ -2224,10 +2239,10 @@ export default function CourseDetail() {
 														onClick={() => {
 															addToCart(
 																course.id,
-																15,
+																userId,
 																course.price,
-																"India",
-																"876382"
+																country,
+																CartId()
 															);
 														}}
 													>
@@ -2240,10 +2255,10 @@ export default function CourseDetail() {
 														onClick={() => {
 															addToCart(
 																course?.id,
-																15,
+																userId,
 																course.price,
-																"India",
-																"876382"
+																country,
+																CartId()
 															);
 														}}
 													>
@@ -2256,10 +2271,10 @@ export default function CourseDetail() {
 														onClick={() => {
 															addToCart(
 																course.id,
-																15,
+																userId,
 																course.price,
-																"India",
-																"876382"
+																country,
+																CartId()
 															);
 														}}
 													>

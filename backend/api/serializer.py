@@ -102,11 +102,27 @@ class CartSerializer(serializers.ModelSerializer):
         model = api_models.Cart
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        super(CartSerializer, self ).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
+
 class CartOrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = api_models.CartOrderItem
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super(CartOrderItemSerializer, self ).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
 
 class CartOrderSerializer(serializers.ModelSerializer):
     order_items = CartOrderItemSerializer(many=True)
@@ -114,6 +130,14 @@ class CartOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.CartOrder
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super(CartOrderSerializer, self ).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
 
 class CertificateSerializer(serializers.ModelSerializer):
 
