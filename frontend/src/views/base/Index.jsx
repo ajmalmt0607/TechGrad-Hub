@@ -51,7 +51,7 @@ export default function Component() {
 	const [cartCount, setCartCount] = useContext(CartContext);
 
 	const country = GetCurrentAddress().country;
-	const userId = UserData().user_id;
+	const userId = UserData()?.user_id;
 	const cartId = CartId();
 
 	const fetchCourse = async () => {

@@ -205,18 +205,18 @@
 // export default Cart
 
 import React, { useContext, useEffect, useState } from "react";
-import { X, ChevronRight, Mail, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
-
+import { X, ChevronRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import BaseHeader from "../partials/BaseHeader";
 import apiInstance from "../../utils/axios";
 import CartId from "../plugins/CartId";
 import Toast from "../plugins/Toast";
 import { CartContext } from "../plugins/Context";
+import { userId } from "../../utils/constants";
 
 export default function Cart() {
 	const [cart, setCart] = useState([]);
-	const [cartStats, setCartStats] = useState([]);
+	const [cartStats, setCartStats] = useState({});
 	const [cartCount, setCartCount] = useContext(CartContext);
 	const [bioData, setBioData] = useState({
 		full_name: "",
@@ -224,198 +224,198 @@ export default function Cart() {
 		country: "",
 	});
 
-	const fetchCartItem = async () => {
+	const fetchCartData = async () => {
 		try {
-			await apiInstance.get(`course/cart-list/${CartId()}/`).then((res) => {
-				console.log(res.data);
-				setCart(res.data);
-			});
-
-			await apiInstance.get(`cart/stats/${CartId()}/`).then((res) => {
-				console.log(res.data);
-				setCartStats(res.data);
-			});
+			const cartResponse = await apiInstance.get(
+				`course/cart-list/${CartId()}/`
+			);
+			const statsResponse = await apiInstance.get(`cart/stats/${CartId()}/`);
+			setCart(cartResponse.data);
+			setCartStats(statsResponse.data);
+			setCartCount(cartResponse.data.length);
 		} catch (error) {
-			console.log(error);
+			console.error("Error fetching cart data:", error);
 		}
 	};
 
 	useEffect(() => {
-		fetchCartItem();
+		fetchCartData();
 	}, []);
-
-	const cartItemDelte = async (itemId) => {
-		await apiInstance
-			.delete(`course/cart-item-delete/${CartId()}/${itemId}/`)
-			.then((res) => {
-				console.log(res.data);
-				fetchCartItem();
-				Toast().fire({
-					icon: "success",
-					title: "Item deleted successfully",
-				});
-				// set cart count after adding to cart
-				apiInstance.get(`course/cart-list/${CartId()}/`).then((res) => {
-					setCartCount(res.data?.length);
-				});
-			});
-	};
 
 	const handleBioDataChange = (e) => {
 		setBioData({ ...bioData, [e.target.name]: e.target.value });
 	};
 
-	console.log(bioData);
+	const deleteCartItem = async (itemId) => {
+		try {
+			await apiInstance.delete(
+				`course/cart-item-delete/${CartId()}/${itemId}/`
+			);
+			Toast().fire({
+				icon: "success",
+				title: "Item removed from cart",
+			});
+			fetchCartData();
+		} catch (error) {
+			console.error("Error deleting cart item:", error);
+		}
+	};
+
+	const navigate = useNavigate();
+
+	const createOrder = async (e) => {
+		e.preventDefault();
+		if (!cart.length) {
+			Toast().fire({
+				icon: "error",
+				title: "Your cart is empty!",
+			});
+			return;
+		}
+		if (!bioData.full_name || !bioData.email || !bioData.country) {
+			Toast().fire({
+				icon: "error",
+				title: "Please complete your personal details",
+			});
+			return;
+		}
+
+		try {
+			const formData = new FormData();
+			formData.append("full_name", bioData.full_name);
+			formData.append("email", bioData.email);
+			formData.append("country", bioData.country);
+			formData.append("cart_id", CartId());
+			formData.append("user_id", userId);
+
+			await apiInstance.post(`order/create-order/`, formData).then((res) => {
+				navigate(`/checkout/${res.data.order_oid}`);
+			});
+			Toast().fire({
+				icon: "success",
+				title: "Order placed successfully",
+			});
+			fetchCartData(); // Update stats and count
+		} catch (error) {
+			console.error("Order creation failed:", error);
+		}
+	};
 
 	return (
 		<>
 			<BaseHeader />
-			<div className="min-h-screen flex mt-6 items-center justify-center bg-white from-purple-50 to-indigo-100 p-4">
+			<div className="min-h-screen flex mt-6 items-center justify-center bg-white p-4">
 				<div className="max-w-4xl w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
-					<div className="text-center">
-						<h1 className="text-3xl font-bold text-gray-900">My Cart</h1>
-						<nav className="flex justify-center mt-2">
-							<ol className="flex items-center space-x-2 text-sm text-gray-600">
-								<li>
-									<Link
-										to="/"
-										className="hover:text-indigo-600 transition-colors"
-									>
-										Home
-									</Link>
-								</li>
-								<ChevronRight className="h-4 w-4" />
-								<li>
-									<Link
-										to="/courses"
-										className="hover:text-indigo-600 transition-colors"
-									>
-										Courses
-									</Link>
-								</li>
-								<ChevronRight className="h-4 w-4" />
-								<li className="text-indigo-600">Cart</li>
-							</ol>
-						</nav>
-					</div>
+					<h1 className="text-3xl font-bold text-gray-900 text-center">
+						My Cart
+					</h1>
 
 					<div className="grid md:grid-cols-3 gap-8">
+						{/* Cart Items */}
 						<div className="md:col-span-2 space-y-6">
 							<div className="bg-white p-6 rounded-lg shadow">
 								<h2 className="text-xl font-semibold mb-4">
 									Cart Items ({cart?.length})
 								</h2>
 								<div className="space-y-4">
-									{cart?.map((course, index) => (
-										<div
-											key={index}
-											className="flex items-center space-x-4 py-4 border-b last:border-b-0"
-										>
-											<img
-												src={course.course.image}
-												width={80}
-												height={60}
-												alt="Course thumbnail"
-												className="rounded"
-											/>
-											<div className="flex-grow">
-												<h3 className="font-medium text-gray-900">
-													Building Scalable APIs with GraphQL
-												</h3>
-												<p className="text-indigo-600 font-semibold">
-													${course.price}
-												</p>
-											</div>
-											<button
-												onClick={() => cartItemDelte(course.id)}
-												className="text-red-500 hover:text-red-700 transition-colors"
+									{cart.length > 0 ? (
+										cart.map((course, index) => (
+											<div
+												key={index}
+												className="flex items-center space-x-4 py-4 border-b last:border-b-0"
 											>
-												<X className="h-5 w-5" />
-											</button>
-										</div>
-									))}
-									{cart?.length < 1 && (
+												<img
+													src={course.course.image}
+													width={80}
+													height={60}
+													alt="Course thumbnail"
+													className="rounded"
+												/>
+												<div className="flex-grow">
+													<h3 className="font-medium text-gray-900">
+														{course.course.name}
+													</h3>
+													<p className="text-indigo-600 font-semibold">
+														${course.price}
+													</p>
+												</div>
+												<button
+													onClick={() => deleteCartItem(course.id)}
+													className="text-red-500 hover:text-red-700 transition-colors"
+												>
+													<X className="h-5 w-5" />
+												</button>
+											</div>
+										))
+									) : (
 										<p className="mt-4 p-4">Your Cart is Empty</p>
 									)}
 								</div>
 							</div>
 
+							{/* Personal Details Form */}
 							<div className="bg-white p-6 rounded-lg shadow">
 								<h2 className="text-xl font-semibold mb-4">Personal Details</h2>
 								<form className="space-y-4">
-									<div className="relative">
-										<input
-											type="text"
-											id="name"
-											name="full_name"
-											className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 pl-10"
-											placeholder="Your name"
-											value={bioData.full_name}
-											onChange={handleBioDataChange}
-										/>
-										<Mail className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-									</div>
-									<div className="relative">
-										<input
-											type="email"
-											id="email"
-											name="email"
-											className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 pl-10"
-											placeholder="Email address"
-											value={bioData.email}
-											onChange={handleBioDataChange}
-										/>
-										<Mail className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-									</div>
-									<div className="relative">
-										<input
-											type="text"
-											id="country"
-											name="country"
-											className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 pl-10"
-											placeholder="Select country"
-											value={bioData.country}
-											onChange={handleBioDataChange}
-										/>
-										<MapPin className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-									</div>
+									<input
+										type="text"
+										name="full_name"
+										placeholder="Full Name"
+										value={bioData.full_name}
+										onChange={handleBioDataChange}
+										className="w-full px-3 py-2 border rounded-md"
+									/>
+									<input
+										type="email"
+										name="email"
+										placeholder="Email Address"
+										value={bioData.email}
+										onChange={handleBioDataChange}
+										className="w-full px-3 py-2 border rounded-md"
+									/>
+									<input
+										type="text"
+										name="country"
+										placeholder="Country"
+										value={bioData.country}
+										onChange={handleBioDataChange}
+										className="w-full px-3 py-2 border rounded-md"
+									/>
 								</form>
 							</div>
 						</div>
 
+						{/* Cart Status */}
 						<div className="md:col-span-1">
 							<div className="bg-white p-6 rounded-lg shadow">
-								<h2 className="text-xl font-semibold mb-4">Cart Total</h2>
+								<h2 className="text-xl font-semibold mb-4">Cart Summary</h2>
 								<ul className="space-y-3 mb-6">
-									<li className="flex justify-between text-sm">
-										<span className="text-gray-600">Sub Total</span>
-										<span className="font-semibold">
-											${cartStats?.price?.toFixed(2)}
-										</span>
+									<li className="flex justify-between">
+										<span>Sub Total</span>
+										<span>${cartStats.price?.toFixed(2)}</span>
 									</li>
-									<li className="flex justify-between text-sm">
-										<span className="text-gray-600">Tax</span>
-										<span className="font-semibold">
-											${cartStats?.tax?.toFixed(2)}
-										</span>
+									<li className="flex justify-between">
+										<span>Tax</span>
+										<span>${cartStats.tax?.toFixed(2)}</span>
 									</li>
-									<li className="flex justify-between text-base font-semibold border-t pt-3">
+									<li className="flex justify-between font-semibold">
 										<span>Total</span>
-										<span>${cartStats?.total?.toFixed(2)}</span>
+										<span>${cartStats.total?.toFixed(2)}</span>
 									</li>
 								</ul>
-								<Link
-									to="/checkout"
-									className="block w-full bg-indigo-600 text-white text-center py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+
+								{/* Checkout Button */}
+								<button
+									onClick={createOrder}
+									disabled={cart.length === 0}
+									className={`w-full py-2 px-4 rounded-md text-white ${
+										cart.length > 0
+											? "bg-indigo-600 hover:bg-indigo-700"
+											: "bg-gray-400 cursor-not-allowed"
+									}`}
 								>
 									Proceed to Checkout
-								</Link>
-								<p className="text-xs text-center mt-4 text-gray-500">
-									By proceeding to checkout, you agree to these{" "}
-									<Link to="#" className="text-indigo-600 hover:underline">
-										Terms of Service
-									</Link>
-								</p>
+								</button>
 							</div>
 						</div>
 					</div>

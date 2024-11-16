@@ -323,7 +323,7 @@ class CreateOrderAPIView(generics.CreateAPIView):
 
         order.save()
 
-        return Response({"message": "Order Created Successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Order Created Successfully", "order_oid": order.oid}, status=status.HTTP_201_CREATED)
     
 
 class checkoutAPIView(generics.RetrieveAPIView):
@@ -372,11 +372,11 @@ class CouponApplyAPIView(generics.CreateAPIView):
                     else:
                         return Response({"message": "No student associated with this order"}, status=status.HTTP_400_BAD_REQUEST)
 
-                    return Response({"message": "Coupon Found and Activated"}, status=status.HTTP_201_CREATED)
+                    return Response({"message": "Coupon Found and Activated","icon": "success"}, status=status.HTTP_201_CREATED)
                 else:
-                    return Response({"message": "Coupon Already Applied"}, status=status.HTTP_200_OK)
+                    return Response({"message": "Coupon Already Applied", "icon": "warning"}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "Coupon Not Found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Coupon Not Found", "icon": "error"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class StripeCheckoutAPIView(generics.CreateAPIView):
