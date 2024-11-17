@@ -18,7 +18,6 @@ import Rater from "react-rater";
 import useAxios from "../../utils/useAxios";
 
 // Assuming these imports are correct for your project structure
-import logo from "../../assets/techgrad.svg";
 import teacher from "../../assets/Best Teacher.png";
 import user from "../../assets/user-1.jpg";
 import BaseHeader from "../partials/BaseHeader";
@@ -95,6 +94,18 @@ export default function Component() {
 			console.log(error);
 		}
 	};
+
+	// Pagination
+	const itemsPerPage = 1;
+	const [currentPage, setCurrentPage] = useState(1);
+	const indexOfLastItem = currentPage * itemsPerPage;
+	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+	const currentItems = courses.slice(indexOfFirstItem, indexOfLastItem);
+	const totalPages = Math.ceil(courses.length / itemsPerPage);
+	const PageNumbers = Array.from(
+		{ length: totalPages },
+		(_, index) => index + 1
+	);
 
 	return (
 		<div className="min-h-screen bg-gray-50">
@@ -183,7 +194,7 @@ export default function Component() {
 							</div>
 						) : (
 							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-								{courses?.slice(0, 8).map((course, index) => (
+								{currentItems.map((course, index) => (
 									<div
 										key={index}
 										className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 ease-in-out flex flex-col"
@@ -264,6 +275,49 @@ export default function Component() {
 								))}
 							</div>
 						)}
+						<nav className="flex justify-center space-x-2">
+							<button
+								className={`px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 flex items-center ${
+									currentPage === 1 ? "cursor-not-allowed opacity-50" : ""
+								}`}
+								onClick={() => {
+									if (currentPage > 1) {
+										setCurrentPage(currentPage - 1);
+									}
+								}}
+								disabled={currentPage === 1}
+							>
+								<ChevronLeft className="h-4 w-4 mr-1" /> Previous
+							</button>
+
+							{PageNumbers.map((number) => (
+								<button
+									key={number}
+									className={`px-4 py-2 ${currentPage === number ? "bg-indigo-600 text-white" : "bg-indigo-200 text-black"}  rounded-md`}
+									onClick={() => {
+										setCurrentPage(number);
+									}}
+								>
+									{number}
+								</button>
+							))}
+
+							<button
+								className={`px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 flex items-center ${
+									currentPage === totalPages
+										? "cursor-not-allowed opacity-50"
+										: "cursor-pointer"
+								}`}
+								onClick={() => {
+									if (currentPage < totalPages) {
+										setCurrentPage(currentPage + 1);
+									}
+								}}
+								aria-disabled={currentPage === totalPages} // Accessible disabled state
+							>
+								Next <ChevronRight className="h-4 w-4 ml-1" />
+							</button>
+						</nav>
 						<div className="mt-12 text-center">
 							<Link
 								to="/courses"

@@ -195,8 +195,11 @@ import {
 	Heart,
 	DollarSign,
 	Settings,
+	CircleUserRound,
+	UserRound,
 } from "lucide-react";
 import { CartContext } from "../plugins/Context";
+import logo from "../../assets/techgrad.svg";
 
 export default function BaseHeader() {
 	const [cartCount, setCartCount] = useContext(CartContext);
@@ -226,21 +229,21 @@ export default function BaseHeader() {
 				<div className="flex justify-between items-center h-16">
 					<div className="flex items-center">
 						{/* Logo */}
-						<Link to="/" className="flex items-center mr-5">
-							<span className="text-xl font-bold">Desphixs</span>
+						<Link to="/" className="flex items-center mr-7">
+							<span className="text-xl font-bold">TECHGRAD</span>
 						</Link>
 
 						{/* Navigation Links */}
 						<nav className="hidden md:flex space-x-4">
 							<Link
 								to="/pages/contact-us/"
-								className="text-gray-600 hover:text-gray-900"
+								className="text-gray-700 font-medium hover:text-gray-900"
 							>
 								Contact Us
 							</Link>
 							<Link
 								to="/pages/about-us/"
-								className="text-gray-600 hover:text-gray-900"
+								className="text-gray-700 font-medium hover:text-gray-900"
 							>
 								About Us
 							</Link>
@@ -249,7 +252,7 @@ export default function BaseHeader() {
 							<div className="relative">
 								<button
 									onClick={() => toggleDropdown("instructor")}
-									className="flex items-center text-gray-600 hover:text-gray-900 dropdown-toggle"
+									className="flex items-center font-medium text-gray-700 hover:text-gray-900 dropdown-toggle"
 								>
 									Instructor <ChevronDown className="ml-1 h-4 w-4" />
 								</button>
@@ -314,7 +317,7 @@ export default function BaseHeader() {
 							<div className="relative">
 								<button
 									onClick={() => toggleDropdown("student")}
-									className="flex items-center text-gray-600 hover:text-gray-900 dropdown-toggle"
+									className="flex items-center font-medium text-gray-700 hover:text-gray-900 dropdown-toggle"
 								>
 									Student <ChevronDown className="ml-1 h-4 w-4" />
 								</button>
@@ -412,19 +415,31 @@ export default function BaseHeader() {
 							)}
 						</div>
 
-						{/* Login and Register Buttons */}
-						<Link
-							to="/login/"
-							className="hidden md:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-						>
-							Login
-						</Link>
-						<Link
-							to="/register/"
-							className="hidden md:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-blue-100 hover:bg-blue-200"
-						>
-							Register
-						</Link>
+						{/* User Icon and Login/Register Dropdown */}
+						<div className="relative">
+							<button
+								onClick={() => toggleDropdown("user")}
+								className="p-2 text-gray-600 hover:bg-gray-100 rounded-full dropdown-toggle"
+							>
+								<UserRound className="h-5 w-5" />
+							</button>
+							{openDropdown === "user" && (
+								<div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
+									<Link
+										to="/login/"
+										className="block px-4 py-2 hover:bg-gray-100"
+									>
+										Login
+									</Link>
+									<Link
+										to="/register/"
+										className="block px-4 py-2 hover:bg-gray-100"
+									>
+										Register
+									</Link>
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>

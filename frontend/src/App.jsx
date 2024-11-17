@@ -18,6 +18,7 @@ import { CartContext } from "./views/plugins/Context";
 import { useEffect, useState } from "react";
 import apiInstance from "./utils/axios";
 import CartId from "./views/plugins/CartId";
+import Search from "./views/base/Search";
 
 function App() {
 	const [cartCount, setCartCount] = useState(0);
@@ -49,6 +50,7 @@ function App() {
 						<Route path="/cart/" element={<Cart />} />
 						<Route path="/checkout/:order_oid/" element={<Checkout />} />
 						<Route path="/payment-success/:order_oid/" element={<Success />} />
+						<Route path="/search/" element={<Search />} />
 					</Routes>
 				</MainWrapper>
 			</BrowserRouter>

@@ -1,42 +1,42 @@
-// Importing necessary dependencies
-import axios from "axios"; // Library for making HTTP requests
-import { getRefreshedToken, isAccessTokenExpired, setAuthUser } from "./auth"; // Functions for token handling
-import { API_BASE_URL } from "./constants"; // Base API URL constant
-import Cookies from "js-cookie"; // Library for handling cookies
+// // Importing necessary dependencies
+// import axios from "axios"; // Library for making HTTP requests
+// import { getRefreshedToken, isAccessTokenExpired, setAuthUser } from "./auth"; // Functions for token handling
+// import { API_BASE_URL } from "./constants"; // Base API URL constant
+// import Cookies from "js-cookie"; // Library for handling cookies
 
-// Custom hook to create and configure an Axios instance for API requests
-const useAxios = () => {
-	// Retrieving access and refresh tokens from cookies
-	const accessToken = Cookies.get("access_token");
-	const refreshToken = Cookies.get("refresh_token");
+// // Custom hook to create and configure an Axios instance for API requests
+// const useAxios = () => {
+// 	// Retrieving access and refresh tokens from cookies
+// 	const accessToken = Cookies.get("access_token");
+// 	const refreshToken = Cookies.get("refresh_token");
 
-	// Creating a new Axios instance with custom configuration
-	const axiosInstance = axios.create({
-		baseURL: API_BASE_URL, // Setting base URL for all requests
-		headers: { Authorization: `Bearer ${accessToken}` }, // Initial Authorization header
-	});
+// 	// Creating a new Axios instance with custom configuration
+// 	const axiosInstance = axios.create({
+// 		baseURL: API_BASE_URL, // Setting base URL for all requests
+// 		headers: { Authorization: `Bearer ${accessToken}` }, // Initial Authorization header
+// 	});
 
-	// Adding a request interceptor to check token expiry and refresh if necessary
-	axiosInstance.interceptors.request.use(async (req) => {
-		// If the access token is not expired, proceed with the request
-		if (!isAccessTokenExpired) {
-			return req;
-		}
+// 	// Adding a request interceptor to check token expiry and refresh if necessary
+// 	axiosInstance.interceptors.request.use(async (req) => {
+// 		// If the access token is not expired, proceed with the request
+// 		if (!isAccessTokenExpired) {
+// 			return req;
+// 		}
 
-		// If expired, call getRefreshedToken() with the refresh token to get a new access token
-		const response = await getRefreshedToken(refreshToken);
-		// Set the new access and refresh tokens in cookies or local storage
-		setAuthUser(response.access, response.refresh);
-		// Update the Authorization header with the new access token
-		req.headers.Authorization = `Bearer ${response.data?.access}`;
-		return req; // Return the modified request
-	});
+// 		// If expired, call getRefreshedToken() with the refresh token to get a new access token
+// 		const response = await getRefreshedToken(refreshToken);
+// 		// Set the new access and refresh tokens in cookies or local storage
+// 		setAuthUser(response.access, response.refresh);
+// 		// Update the Authorization header with the new access token
+// 		req.headers.Authorization = `Bearer ${response.data?.access}`;
+// 		return req; // Return the modified request
+// 	});
 
-	// Return the configured Axios instance for use in API calls
-	return axiosInstance;
-};
+// 	// Return the configured Axios instance for use in API calls
+// 	return axiosInstance;
+// };
 
-export default useAxios; // Export the custom hook for use in components
+// export default useAxios; // Export the custom hook for use in components
 
 // Summary of Key Functions and Usage:
 
@@ -55,3 +55,39 @@ export default useAxios; // Export the custom hook for use in components
 // Interceptors:      Axios interceptors allow you to intercept requests or responses before they are handled.
 //                    In this code, axiosInstance.interceptors.request.use is a request interceptor that checks if the access token is expired before making each request.
 //                    If it is, the interceptor automatically tries to refresh it by calling getRefreshedToken.
+
+/////////////////////////////////////
+// BUG FIX - 17-11-2024 - 10:30 PM
+////////////////////////////////////
+
+import axios from "axios";
+import { getRefreshedToken, isAccessTokenExpired, setAuthUser } from "./auth";
+import { API_BASE_URL } from "./constants";
+import Cookies from "js-cookie";
+
+const useAxios = () => {
+	const accessToken = Cookies.get("access_token");
+
+	const axiosInstance = axios.create({
+		baseURL: API_BASE_URL,
+		headers: { Authorization: `Bearer ${accessToken}` },
+	});
+
+	axiosInstance.interceptors.request.use(async (req) => {
+		if (isAccessTokenExpired(accessToken)) {
+			try {
+				const response = await getRefreshedToken();
+				setAuthUser(response.access, response.refresh);
+				req.headers.Authorization = `Bearer ${response.access}`;
+			} catch (error) {
+				console.error("Token refresh error", error);
+				throw error; // Redirect to login in UI
+			}
+		}
+		return req;
+	});
+
+	return axiosInstance;
+};
+
+export default useAxios;
