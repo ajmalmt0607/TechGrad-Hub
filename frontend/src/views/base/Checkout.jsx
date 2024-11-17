@@ -297,6 +297,7 @@ import {
 	X,
 	Edit2,
 	CreditCard,
+	Loader,
 } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -312,6 +313,7 @@ import { PAYPAL_CLIENT_ID, userId } from "../../utils/constants";
 export default function Checkout() {
 	const [order, setOrder] = useState([]);
 	const [coupon, setCoupon] = useState("");
+	const [paymentLoading, setPaymentLoading] = useState(false);
 	const param = useParams();
 
 	const fetchOrder = async () => {
@@ -359,11 +361,19 @@ export default function Checkout() {
 	}, []);
 	console.log(typeof order.total); // Check the type
 
+	// PayPal Payment
 	const initialOptions = {
 		clientId: PAYPAL_CLIENT_ID,
 		currency: "USD",
 		intent: "capture",
 	};
+
+	// Stripe Payment Method
+	const payWithStripe = (event) => {
+		setPaymentLoading(true);
+		event.target.form.submit();
+	};
+
 	return (
 		<>
 			<BaseHeader />
@@ -559,13 +569,34 @@ export default function Checkout() {
 										</li>
 									</ul>
 									<div className="space-y-2">
-										<Link
-											to="/success/txn_id"
-											className="block w-full bg-indigo-600 text-white text-center py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+										<form
+											action={`http://127.0.0.1:8000/api/v1/payment/stripe-checkout/${order.oid}/`}
+											className=""
+											method="POST"
 										>
-											<CreditCard className="inline-block mr-2 h-5 w-5" />
-											Pay With Stripe
-										</Link>
+											{paymentLoading === true ? (
+												<button
+													type="submit"
+													onClick={payWithStripe}
+													className="block w-full bg-indigo-600 text-white text-center py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+												>
+													{" "}
+													<div className="flex justify-center">
+														<p className="mr-1">Processing</p>
+														<Loader className="animate-spin h-5 w-5 text-white" />
+													</div>
+												</button>
+											) : (
+												<button
+													type="submit"
+													onClick={payWithStripe}
+													className="block w-full bg-indigo-600 text-white text-center py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+												>
+													<CreditCard className="inline-block mr-2 h-5 w-5" />
+													Pay With Stripe
+												</button>
+											)}
+										</form>
 										{/* paypal initialOptions defined top */}
 										<PayPalScriptProvider options={initialOptions}>
 											{order.total !== undefined ? (
