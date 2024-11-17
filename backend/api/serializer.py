@@ -192,10 +192,10 @@ class CountrySerializer(serializers.ModelSerializer):
 class EnrolledCourseSerializer(serializers.ModelSerializer):
     lectures = VariantItemSerializer(many=True, read_only=True)
     completed_lesson = CompletedLessonSerializer(many=True, read_only=True)
-    curriculum = VariantItemSerializer(many=True, read_only=True)
+    curriculum = VariantSerializer(many=True, read_only=True)
     note = NoteSerializer(many=True, read_only=True)
     question_answer = Question_AnswerSerializer(many=True, read_only=True)
-    review = ReviewSerializer(many=True, read_only=True)
+    review = ReviewSerializer(many=False, read_only=True)
 
     class Meta:
         model = api_models.EnrolledCourse

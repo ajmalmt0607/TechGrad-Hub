@@ -2180,7 +2180,7 @@ export default function CourseDetail() {
 									<div className="bg-white p-6 rounded-lg shadow">
 										<div className="relative">
 											<img
-												src="https://geeksui.codescandy.com/geeks/assets/images/course/course-css.jpg"
+												src={course.image}
 												alt="Course thumbnail"
 												width={400}
 												height={200}
