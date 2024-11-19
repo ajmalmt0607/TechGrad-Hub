@@ -1,154 +1,182 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from "react";
+import { Search, Book, CheckCircle, Award } from "lucide-react";
 
-import BaseHeader from '../partials/BaseHeader'
-import BaseFooter from '../partials/BaseFooter'
-import Sidebar from './Partials/Sidebar'
-import Header from './Partials/Header'
+const courses = [
+	{
+		id: 1,
+		title: "The Python Course: build web application",
+		level: "Beginner",
+		language: "French",
+		enrolled: "Feb 28, 2024",
+		lectures: 1,
+		completed: 0,
+		progress: 0,
+		image: "/placeholder.svg?height=100&width=200",
+	},
+	{
+		id: 2,
+		title: "Node.js Tutorials - For beginners and professionals",
+		level: "Advanced",
+		language: "English",
+		enrolled: "Feb 28, 2024",
+		lectures: 11,
+		completed: 3,
+		progress: 27,
+		image: "/placeholder.svg?height=100&width=200",
+	},
+];
 
+export default function Dashboard() {
+	return (
+		<div className="space-y-8">
+			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+				<div>
+					<h1 className="text-2xl font-bold">Welcome, Temporibus Asperiorer</h1>
+					<p className="text-gray-500 dark:text-gray-400">
+						tepu@mailinator.com
+					</p>
+				</div>
+				<div className="flex flex-wrap gap-2">
+					<button className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600">
+						Create New Course
+					</button>
+					<button className="px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-md hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600">
+						Settings
+					</button>
+					<button className="px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-md hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600">
+						Contact Support
+					</button>
+				</div>
+			</div>
 
-function Dashboard() {
-    return (
-        <>
-            <BaseHeader />
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+				<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+					<div className="flex items-center justify-between">
+						<h3 className="text-lg font-semibold">Total Courses</h3>
+						<Book className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+					</div>
+					<p className="text-3xl font-bold mt-2">2</p>
+				</div>
+				<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+					<div className="flex items-center justify-between">
+						<h3 className="text-lg font-semibold">Complete Lessons</h3>
+						<CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+					</div>
+					<p className="text-3xl font-bold mt-2">3</p>
+				</div>
+				<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+					<div className="flex items-center justify-between">
+						<h3 className="text-lg font-semibold">Achieved Certificates</h3>
+						<Award className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+					</div>
+					<p className="text-3xl font-bold mt-2">0</p>
+				</div>
+			</div>
 
-            <section className="pt-5 pb-5">
-                <div className="container">
-                    {/* Header Here */}
-                    <Header />
-                    <div className="row mt-0 mt-md-4">
-                        {/* Sidebar Here */}
-                        <Sidebar />
-                        <div className="col-lg-9 col-md-8 col-12">
-                            <div className="row mb-4">
-                                <h4 className="mb-0 mb-4"> <i className='bi bi-grid-fill'></i> Dashboard</h4>
-                                {/* Counter item */}
-
-                                <div className="col-sm-6 col-lg-4 mb-3 mb-lg-0">
-                                    <div className="d-flex justify-content-center align-items-center p-4 bg-warning bg-opacity-10 rounded-3">
-                                        <span className="display-6 lh-1 text-orange mb-0">
-                                            <i className="fas fa-tv fa-fw" />
-                                        </span>
-                                        <div className="ms-4">
-                                            <div className="d-flex">
-                                                <h5 className="purecounter mb-0 fw-bold" >0</h5>
-                                            </div>
-                                            <p className="mb-0 h6 fw-light">Total Courses</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Counter item */}
-                                <div className="col-sm-6 col-lg-4 mb-3 mb-lg-0">
-                                    <div className="d-flex justify-content-center align-items-center p-4 bg-danger bg-opacity-10 rounded-3">
-                                        <span className="display-6 lh-1 text-purple mb-0">
-                                            <i className="fas fa-clipboard-check fa-fw" />
-                                        </span>
-                                        <div className="ms-4">
-                                            <div className="d-flex">
-                                                <h5 className="purecounter mb-0 fw-bold" > 0</h5>
-                                            </div>
-                                            <p className="mb-0 h6 fw-light">Complete lessons</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Counter item */}
-                                <div className="col-sm-6 col-lg-4 mb-3 mb-lg-0">
-                                    <div className="d-flex justify-content-center align-items-center p-4 bg-success bg-opacity-10 rounded-3">
-                                        <span className="display-6 lh-1 text-success mb-0">
-                                            <i className="fas fa-medal fa-fw" />
-                                        </span>
-                                        <div className="ms-4">
-                                            <div className="d-flex">
-                                                <h5 className="purecounter mb-0 fw-bold" > 0</h5>
-                                            </div>
-                                            <p className="mb-0 h6 fw-light">Achieved Certificates</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="card mb-4">
-                                <div className="card-header">
-                                    <h3 className="mb-0">Courses</h3>
-                                    <span>
-                                        Start watching courses now from your dashboard page.
-                                    </span>
-                                </div>
-                                <div className="card-body">
-                                    <form className="row gx-3">
-                                        <div className="col-lg-12 col-md-12 col-12 mb-lg-0 mb-2">
-                                            <input
-                                                type="search"
-                                                className="form-control"
-                                                placeholder="Search Your Courses"
-                                            />
-                                        </div>
-                                    </form>
-                                </div>
-                                <div className="table-responsive overflow-y-hidden">
-                                    <table className="table mb-0 text-nowrap table-hover table-centered text-nowrap">
-                                        <thead className="table-light">
-                                            <tr>
-                                                <th>Courses</th>
-                                                <th>Date Enrolled</th>
-                                                <th>Lectures</th>
-                                                <th>Completed</th>
-                                                <th>Action</th>
-                                                <th />
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div className="d-flex align-items-center">
-                                                        <div>
-                                                            <a href="#">
-                                                                <img
-                                                                    src="https://geeksui.codescandy.com/geeks/assets/images/course/course-wordpress.jpg"
-                                                                    alt="course"
-                                                                    className="rounded img-4by3-lg"
-                                                                    style={{ width: "100px", height: "70px", borderRadius: "50%", objectFit: "cover" }}
-                                                                />
-                                                            </a>
-                                                        </div>
-                                                        <div className="ms-3">
-                                                            <h4 className="mb-1 h5">
-                                                                <a href="#" className="text-inherit text-decoration-none text-dark">
-                                                                    Create a Website with WordPress
-                                                                </a>
-                                                            </h4>
-                                                            <ul className="list-inline fs-6 mb-0">
-                                                                <li className="list-inline-item">
-                                                                    <i className='bi bi-clock-history'></i>
-                                                                    <span className='ms-1'>1hr 30 Mins</span>
-                                                                </li>
-                                                                <li className="list-inline-item">
-                                                                    <i className='bi bi-reception-4'></i>
-                                                                    <span className='ms-1'>Beginner</span>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td><p className='mt-3'>7/11/2025</p></td>
-                                                <td><p className='mt-3'>15</p></td>
-                                                <td><p className='mt-3'>7</p></td>
-                                                <td>
-                                                    <button className='btn btn-primary btn-sm mt-3'>Continue Course <i className='fas fa-arrow-right'></i></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <BaseFooter />
-        </>
-    )
+			<section className="space-y-4">
+				<div className="flex items-center justify-between">
+					<h2 className="text-2xl font-bold">Courses</h2>
+				</div>
+				<div className="flex flex-wrap items-center gap-2">
+					{["All Courses", "In Progress", "Completed"].map((status) => (
+						<button
+							key={status}
+							className="px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-md hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
+						>
+							{status}
+						</button>
+					))}
+				</div>
+				<div className="flex items-center space-x-2">
+					<div className="relative flex-1">
+						<input
+							type="search"
+							placeholder="Search Your Courses"
+							className="w-full pl-10 pr-4  py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+						/>
+						<Search
+							className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+							size={20}
+						/>
+					</div>
+				</div>
+				<div className="overflow-x-auto">
+					<table className="min-w-full bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+						<thead className="bg-gray-50 dark:bg-gray-700">
+							<tr>
+								<th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+									Courses
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+									Enrolled
+								</th>
+								<th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+									Lectures
+								</th>
+								<th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+									Completed
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+									Progress
+								</th>
+								<th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+									Action
+								</th>
+							</tr>
+						</thead>
+						<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+							{courses.map((course) => (
+								<tr key={course.id}>
+									<td className="px-6 py-4 whitespace-nowrap">
+										<div className="flex items-center">
+											<img
+												className="h-10 w-10 rounded-full"
+												src={course.image}
+												alt=""
+											/>
+											<div className="ml-4">
+												<div className="text-sm font-medium text-gray-900 dark:text-white">
+													{course.title}
+												</div>
+												<div className="text-sm text-gray-500 dark:text-gray-400">
+													<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+														{course.level}
+													</span>
+													<span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+														{course.language}
+													</span>
+												</div>
+											</div>
+										</div>
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-left text-sm text-gray-500 dark:text-gray-400">
+										{course.enrolled}
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500 dark:text-gray-400">
+										{course.lectures}
+									</td>
+									<td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+										{course.completed}
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap">
+										<div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+											<div
+												className="bg-purple-600 h-2.5 rounded-full dark:bg-purple-500"
+												style={{ width: `${course.progress}%` }}
+											></div>
+										</div>
+									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+										<button className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300">
+											Continue
+										</button>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			</section>
+		</div>
+	);
 }
-
-export default Dashboard

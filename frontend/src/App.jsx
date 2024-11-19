@@ -13,12 +13,16 @@ import CourseDetail from "./views/base/CourseDetail";
 import Cart from "./views/base/Cart";
 import Checkout from "./views/base/Checkout";
 import Success from "./views/base/Success";
+import Dashboard from "./views/student/Dashboard";
 
 import { CartContext } from "./views/plugins/Context";
 import { useEffect, useState } from "react";
 import apiInstance from "./utils/axios";
 import CartId from "./views/plugins/CartId";
 import Search from "./views/base/Search";
+import Layout from "./views/student/Partials/Layout";
+import NotFound from "./views/base/NotFound";
+import StudentChangePassword from "./views/student/ChangePassword";
 
 function App() {
 	const [cartCount, setCartCount] = useState(0);
@@ -32,27 +36,30 @@ function App() {
 	return (
 		<CartContext.Provider value={[cartCount, setCartCount]}>
 			<BrowserRouter>
-				<MainWrapper>
-					<Routes>
-						<Route path="/register/" element={<Register />} />
-						<Route path="/login/" element={<Login />} />
-						<Route path="/logout/" element={<Logout />} />
-						<Route path="/forgot-password/" element={<ForgotPassword />} />
-						<Route
-							path="/create-new-password/"
-							element={<CreateNewPassword />}
-						/>
-						<Route path="/course-detail/" element={<CourseDetail />} />
+				<Routes>
+					{/* Protected Routes for Students */}
+					<Route path="/student" element={<Layout />}>
+						<Route path="dashboard" element={<Dashboard />} />
+						<Route path="change-password" element={<StudentChangePassword />} />
 
-						{/* Base Routes */}
-						<Route path="/" element={<Index />} />
-						<Route path="/course-detail/:slug/" element={<CourseDetail />} />
-						<Route path="/cart/" element={<Cart />} />
-						<Route path="/checkout/:order_oid/" element={<Checkout />} />
-						<Route path="/payment-success/:order_oid/" element={<Success />} />
-						<Route path="/search/" element={<Search />} />
-					</Routes>
-				</MainWrapper>
+						{/* Catch-all route for unmatched paths */}
+						<Route path="*" element={<NotFound />} />
+					</Route>
+					<Route path="/register/" element={<Register />} />
+					<Route path="/login/" element={<Login />} />
+					<Route path="/logout/" element={<Logout />} />
+					<Route path="/forgot-password/" element={<ForgotPassword />} />
+					<Route path="/create-new-password/" element={<CreateNewPassword />} />
+					<Route path="/course-detail/" element={<CourseDetail />} />
+
+					{/* Base Routes */}
+					<Route path="/" element={<Index />} />
+					<Route path="/course-detail/:slug/" element={<CourseDetail />} />
+					<Route path="/cart/" element={<Cart />} />
+					<Route path="/checkout/:order_oid/" element={<Checkout />} />
+					<Route path="/payment-success/:order_oid/" element={<Success />} />
+					<Route path="/search/" element={<Search />} />
+				</Routes>
 			</BrowserRouter>
 		</CartContext.Provider>
 	);

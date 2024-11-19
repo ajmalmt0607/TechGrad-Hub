@@ -6,6 +6,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
 import stripe.error
+from django.contrib.auth.hashers import check_password
 
 from api import serializer as api_serializer
 from api import models as api_models
@@ -110,6 +111,26 @@ class PasswordChangeAPIView(generics.CreateAPIView):
         else:
             return Response({"message": "User Does Not Exist"}, status=status.HTTP_404_NOT_FOUND)
 
+
+class ChangePasswordAPIView(generics.CreateAPIView):
+    serializer_class = api_serializer.UserSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        old_password = request.data['old_password']
+        new_password = request.data['new_password']
+
+        user = User.objects.get(id=user_id)
+        if user is not None:
+            if check_password(old_password, user.password):
+                user.set_password(new_password)
+                user.save()
+                return Response({"message": "Password changed successfully", "icon":"success"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "Old password is incorrect", "icon":"warning"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"message": "User Does Not Exist", "icon":"error"}, status=status.HTTP_404_NOT_FOUND)  
 
 class CategoryListAPIView(generics.ListAPIView):
     # when evere we use the ListAPIView we need to know that we try to retrieve a list of items from the database
@@ -267,9 +288,9 @@ class CartStatsAPIView(generics.RetrieveAPIView):
 
 
 class CreateOrderAPIView(generics.CreateAPIView):
-    queryset = api_models.CartOrder.objects.all()
     serializer_class = api_serializer.CartOrderSerializer
     permission_classes = [AllowAny]
+    queryset = api_models.CartOrder.objects.all()
 
     def create(self, request, *args, **kwargs):
         # Extract Data from the Request - Front end developer should pass all this data
@@ -299,22 +320,36 @@ class CreateOrderAPIView(generics.CreateAPIView):
         )
 
         for c in cart_items:
-            api_models.CartOrderItem.objects.create(
-                order=order,
-                course=c.course,
-                price=c.price,
-                tax_fee=c.tax_fee,
-                total=c.total,
-                initial_total = c.total,
-                teacher = c.course.teacher
-            )
+            # Check if the CartOrderItem already exists for this order and course
+            existing_item = api_models.CartOrderItem.objects.filter(order=order, course=c.course).first()
 
-            total_price += Decimal(c.price)
-            total_tax += Decimal(c.tax_fee)
-            total_initial_total += Decimal(c.total)
-            total_total += Decimal(c.total)
+            if existing_item:
+                # Optionally, update the existing item if necessary (e.g., update price or quantity)
+                # existing_item.price = c.price
+                # existing_item.total = c.total
+                # existing_item.save()
+
+                continue  # Skip creating a duplicate item
+            else:
+                # Create a new CartOrderItem if it doesn't exist
+                api_models.CartOrderItem.objects.create(
+                    order=order,
+                    course=c.course,
+                    price=c.price,
+                    tax_fee=c.tax_fee,
+                    total=c.total,
+                    initial_total=c.total,
+                    teacher=c.course.teacher
+                )
+
+            # Update totals as before
+            total_price += Decimal(str(c.price))
+            total_tax += Decimal(str(c.tax_fee))
+            total_initial_total += Decimal(str(c.total))
+            total_total += Decimal(str(c.total))
 
             order.teachers.add(c.course.teacher)
+
         
         order.sub_total = total_price
         order.tax_fee = total_tax
@@ -444,6 +479,7 @@ class PaymentSuccessAPIView(generics.CreateAPIView):
 
         order = api_models.CartOrder.objects.get(oid=order_oid)
         order_items = api_models.CartOrderItem.objects.filter(order=order)
+        print({'Order items': order_items})
 
         # Paypal payment success
 
@@ -527,3 +563,242 @@ class SearchCourseAPIView(generics.ListAPIView):
         query = self.request.GET.get('query')
         return api_models.Course.objects.filter(title__contains=query, platform_status="Published", teacher_course_status="Published")
 
+
+class StudentSummaryAPIView(generics.ListAPIView):
+    serializer_class = api_serializer.StudentSummarySerializer
+    permission_classes = [AllowAny]
+
+    # Why Override These Methods?
+    # To customize the queryset based on the user's ID
+    # The default queryset returns all the objects of the model
+    def get_queryset(self):# Here we rewriting default query set
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+
+        total_courses = api_models.EnrolledCourse.objects.filter(user=user).count()
+        completed_lessons = api_models.CompletedLesson.objects.filter(user=user).count()
+        achieved_certificates  = api_models.Certificate.objects.filter(user=user).count()
+
+
+        return [{
+            "total_courses": total_courses,
+            "completed_lessons": completed_lessons,
+            "achieved_certificates": achieved_certificates
+        }]
+    
+    # By default, ListAPIView fetches data using queryset and sends it.
+    # Since the custom queryset returns a list of dictionaries (not directly from the database), you need to ensure the data is serialized properly.
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        # if we not serialize this query set frontend returns the error beacuse above we only return the django objects on above
+        serializer = self.get_serializer(queryset, many=True)# Serializes this data. many=True is used because you're serializing a list (even if it's just one dictionary).
+        return Response(serializer.data)
+    
+    # Here’s a step-by-step flow:
+    # 1. Client Requests Data - GET /api/student-summary/<user_id>/
+    # 2. View Calls list() Method - list() method is automatically called because StudentSummaryAPIView inherits from ListAPIView.
+    # 3. list() internally calls get_queryset() - Fetches your custom data from the queryset() method - queryset = self.get_queryset()
+    # 4. Data Passed to Serializer - Once queryset returns the data (a list of dictionaries), the list() method uses the serializer to format it:
+         # serializer = self.get_serializer(queryset, many=True)
+         # What Happens Here?
+            # self.get_serializer() calls your StudentSummarySerializer.
+            # The serializer takes each dictionary in the list and validates/structures the data according to the fields you defined:
+                # total_courses = serializers.IntegerField(default=0)
+                # completed_lessons = serializers.IntegerField(default=0)
+                # achieved_certificates = serializers.IntegerField(default=0)
+    # 5. Serializer Outputs JSON Data
+        # The serializer converts the validated data into JSON format.
+        # Response(serializer.data) sends this JSON to the frontend.    
+
+
+
+class StudentCourseListAPIView(generics.ListAPIView):
+    serializer_class = api_serializer.EnrolledCourseSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+        return api_models.EnrolledCourse.objects.filter(user=user)
+    
+class StudentCourseDetailAPIView(generics.RetrieveAPIView):
+    serializer_class = api_serializer.EnrolledCourseSerializer
+    permission_classes = [AllowAny]
+    lookup_field = 'enrollment_id'
+
+
+    def get_object(self):
+        user_id = self.kwargs['user_id']
+        enrollment_id = self.kwargs['enrollment_id']
+        user = User.objects.get(id=user_id)
+        return api_models.EnrolledCourse.objects.get(user=user, enrollment_id=enrollment_id)
+    
+
+class StudentCourseCompletedCreateAPIView(generics.CreateAPIView):
+    serializer_class = api_serializer.CompletedLessonSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        course_id = request.data['course_id']
+        variant_item_id = request.data['variant_item_id']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+        variant_item = api_models.VariantItem.objects.get(variant_item_id=variant_item_id)
+
+        completed_lesson = api_models.CompletedLesson.objects.filter(user=user, course=course, variant_item=variant_item).first()
+
+        if completed_lesson:
+            completed_lesson.delete()
+            return Response({"message": "Course marked as not completed"})
+
+        else:
+            api_models.CompletedLesson.objects.create(
+                user=user,
+                course=course,
+                variant_item=variant_item,
+            )
+            return Response({"message": "Course marked as completed"})
+        
+
+class StudentNoteCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = api_serializer.NoteSerializer
+    permission_classes = [AllowAny]
+
+    # overwriting default get queryset
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        enrollement_id = self.kwargs['enrollement_id']
+
+        user = User.objects.get(id=user_id)
+        enrolled = api_models.EnrolledCourse.objects.get(enrollment_id=enrollement_id)
+
+        return api_models.Note.objects.filter(user=user, course=enrolled.course)
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        enrollment_id = request.data['enrollment_id']
+        title = request.data['title']
+        note = request.data['note']
+
+        user = User.objects.get(id=user_id)
+        enrolled = api_models.EnrolledCourse.objects.get(enrollment_id=enrollment_id)
+
+        api_models.Note.objects.create(user=user, title=title, note=note, course=enrolled.course)
+
+
+        return Response({"message": "Note created successfully"}, status=status.HTTP_201_CREATED)
+    
+
+class StudentNoteDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = api_serializer.NoteSerializer
+    permission_classes = [AllowAny]
+
+    # RetrieveUpdateDestroyAPIView
+    # if the view called using patch request it will update the whatever filed we sent for an update
+    # if the view called using delete request it will delete this from database   
+    def get_object(self):
+        user_id = self.kwargs['user_id']
+        enrollement_id = self.kwargs['enrollement_id']
+        note_id = self.kwargs['note_id']
+
+        user = User.objects.get(id=user_id)
+        enrolled = api_models.EnrolledCourse.objects.get(enrollment_id=enrollement_id)
+        note = api_models.Note.objects.get(id=note_id, user=user, course=enrolled.course)
+
+        return note
+
+class StudentRateCourseCreateAPIView(generics.CreateAPIView):
+    serializer_class = api_serializer.ReviewSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        course_id = request.data['course_id']
+        rating = request.data['rating']
+        review = request.data['review']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+
+        api_models.Review.objects.create(
+            user=user,
+            course=course,
+            rating=rating,
+            review=review,
+            active=True,
+        )
+
+        return Response({"message": "Review created successfully"}, status=status.HTTP_201_CREATED)
+    
+
+class StudentRateCourseUpdateAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = api_serializer.ReviewSerializer
+    permission_classes = [AllowAny]
+
+    def get_object(self):
+        user_id = self.kwargs['user_id']
+        review_id = self.kwargs['review_id']
+
+        user = User.objects.get(id=user_id)
+        return api_models.Review.objects.get(id=review_id, user=user)
+
+# This View is for list and post whislist of students 
+class StudentWhishlistListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = api_serializer.WhishlistSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+        return api_models.Whishlist.objects.filter(user=user)
+    
+    def create(self, request, *args, **kwargs):
+        user_id = request.data['user_id']
+        course_id = request.data['course_id']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+
+        wishlist = api_models.Whishlist.objects.filter(user=user, course=course).first()
+        if wishlist:
+            wishlist.delete()
+            return Response({"message": "Course removed from wishlist"}, status=status.HTTP_200_OK)
+        else:
+            api_models.Whishlist.objects.create(user=user, course=course)
+            return Response({"message": "Course added to wishlist"}, status=status.HTTP_201_CREATED)
+        
+
+class QuestionAnswerListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = api_serializer.Question_AnswerSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        course = api_models.Course.objects.get(id=course_id)
+        return api_models.Question_Answer.objects.filter(course=course)
+    
+    def create(self, request, *args, **kwargs):
+        course_id = request.data['course_id']
+        user_id = request.data['user_id']
+        title = request.data['title']
+        message = request.data['message']
+
+        user = User.objects.get(id=user_id)
+        course = api_models.Course.objects.get(id=course_id)
+
+        question = api_models.Question_Answer.objects.create(
+            user=user, 
+            course=course, 
+            title=title, 
+        )
+
+        api_models.Question_Answer_Message.objects.create(
+            course=course,
+            user=user,
+            message=message,
+            question=question
+        )
+
+        return Response({"message": "Question and Answer created successfully"}, status=status.HTTP_201_CREATED)

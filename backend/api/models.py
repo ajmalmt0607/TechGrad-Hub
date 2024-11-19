@@ -207,7 +207,7 @@ class Question_Answer(models.Model):
     class Meta:
         ordering = ['-date']
 
-    def message(self):
+    def messages(self):
         return Question_Answer_Message.objects.filter(question=self)
     
     def profile(self):
@@ -368,7 +368,7 @@ class Review(models.Model):
     review = models.TextField()
     rating = models.IntegerField(choices=RATING, default=None)
     reply = models.CharField(null=True, blank=True, max_length=1000)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(default=False)
     date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
