@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { CartContext } from "../../plugins/Context";
 import logo from "../../../assets/techgrad.svg";
+import { userAuthStore } from "../../../store/auth";
 
 export default function BaseHeader() {
 	const [cartCount] = useContext(CartContext);
@@ -36,6 +37,14 @@ export default function BaseHeader() {
 		document.addEventListener("click", closeDropdowns);
 		return () => document.removeEventListener("click", closeDropdowns);
 	}, []);
+
+	// checking user is logged in or not
+	const [isLoggedIn, user] = userAuthStore((state) => [
+		state.isLoggedIn,
+		state.user,
+	]);
+
+	console.log(isLoggedIn());
 
 	return (
 		<header className="bg-white text-gray-900 shadow-sm fixed top-0 left-0 right-0 z-10">
@@ -228,18 +237,33 @@ export default function BaseHeader() {
 							</button>
 							{openDropdown === "user" && (
 								<div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
-									<Link
-										to="/login/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										Login
-									</Link>
-									<Link
-										to="/register/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										Register
-									</Link>
+									{isLoggedIn() === true ? (
+										<>
+											{/* Logout Link */}
+											<Link
+												to="/logout/"
+												className="block px-4 py-2 hover:bg-gray-100"
+											>
+												Logout
+											</Link>
+										</>
+									) : (
+										<>
+											{/* login and register Link */}
+											<Link
+												to="/login/"
+												className="block px-4 py-2 hover:bg-gray-100"
+											>
+												login
+											</Link>
+											<Link
+												to="/register/"
+												className="block px-4 py-2 hover:bg-gray-100"
+											>
+												register
+											</Link>
+										</>
+									)}
 								</div>
 							)}
 						</div>

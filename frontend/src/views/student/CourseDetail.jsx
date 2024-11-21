@@ -1,702 +1,1380 @@
-import React, { useState } from 'react'
-import BaseHeader from '../partials/BaseHeader'
-import BaseFooter from '../partials/BaseFooter'
-import Sidebar from './Partials/Sidebar'
-import Header from './Partials/Header'
+// import React, { useState, useEffect, useCallback, useMemo } from "react";
+// import { useParams } from "react-router-dom";
+// import {
+// 	Play,
+// 	Pause,
+// 	Lock,
+// 	CheckCircle,
+// 	ChevronDown,
+// 	ChevronUp,
+// 	Edit,
+// 	Trash2,
+// 	MessageSquare,
+// 	X,
+// } from "lucide-react";
+// import Skeleton from "react-loading-skeleton";
+// import "react-loading-skeleton/dist/skeleton.css";
+// import useAxios from "../../utils/useAxios";
+// import UserData from "../plugins/UserData";
+// import VideoPlayer from "./Partials/VideoPlayer";
 
-import ReactPlayer from 'react-player'
+// export default function CourseDetail() {
+// 	const [course, setCourse] = useState(null);
+// 	const [currentVideo, setCurrentVideo] = useState(null);
+// 	const [expandedSection, setExpandedSection] = useState(null);
+// 	const [completedLectures, setCompletedLectures] = useState(new Set());
+// 	const [activeTab, setActiveTab] = useState("lectures");
+// 	const [notes, setNotes] = useState([]);
+// 	const [discussions, setDiscussions] = useState([]);
+// 	const [showNoteModal, setShowNoteModal] = useState(false);
+// 	const [showEditNoteModal, setShowEditNoteModal] = useState(false);
+// 	const [editingNote, setEditingNote] = useState(null);
+// 	const [showAskQuestionModal, setShowAskQuestionModal] = useState(false);
+// 	const [showJoinConversationModal, setShowJoinConversationModal] =
+// 		useState(false);
+// 	const [selectedDiscussion, setSelectedDiscussion] = useState(null);
+// 	const [isLoading, setIsLoading] = useState(true);
 
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+// 	const param = useParams();
 
-function CourseDetail() {
+// 	const fetchCourseDetail = useCallback(async () => {
+// 		setIsLoading(true);
+// 		try {
+// 			const res = await useAxios().get(
+// 				`student/course-detail/${UserData()?.user_id}/${param.enrollment_id}/`
+// 			);
+// 			setCourse(res.data);
+// 			setCurrentVideo(res.data?.curriculum[0]?.variant_items[0]);
+// 		} catch (error) {
+// 			console.error("Error fetching course details:", error);
+// 		} finally {
+// 			setIsLoading(false);
+// 		}
+// 	}, [param.enrollment_id]);
 
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => { setShow(true); }
+// 	useEffect(() => {
+// 		fetchCourseDetail();
+// 	}, [fetchCourseDetail]);
 
-  const [noteShow, setNoteShow] = useState(false);
-  const handleNoteClose = () => setNoteShow(false);
-  const handleNoteShow = () => { setNoteShow(true); }
+// 	const handleVideoChange = useCallback((video) => {
+// 		setCurrentVideo(video);
+// 	}, []);
 
-  const [ConversationShow, setConversationShow] = useState(false);
-  const handleConversationClose = () => setConversationShow(false);
-  const handleConversationShow = () => { setConversationShow(true); }
+// 	const handleToggleCompleted = useCallback((lectureId) => {
+// 		setCompletedLectures((prev) => {
+// 			const newSet = new Set(prev);
+// 			if (newSet.has(lectureId)) {
+// 				newSet.delete(lectureId);
+// 			} else {
+// 				newSet.add(lectureId);
+// 			}
+// 			return newSet;
+// 		});
+// 	}, []);
 
-  return (
-    <>
-      <BaseHeader />
+// 	const calculateProgress = useCallback(() => {
+// 		if (!course) return 0;
+// 		const totalLectures = course.curriculum.reduce(
+// 			(acc, section) => acc + section.variant_items.length,
+// 			0
+// 		);
+// 		return (completedLectures.size / totalLectures) * 100;
+// 	}, [course, completedLectures]);
 
-      <section className="pt-5 pb-5">
-        <div className="container">
-          {/* Header Here */}
-          <Header />
-          <div className="row mt-0 mt-md-4">
-            {/* Sidebar Here */}
-            <Sidebar />
-            <div className="col-lg-9 col-md-8 col-12">
-              {/* <section className="bg-blue py-7">
-                <div className="container">
-                  <ReactPlayer url='https://www.youtube.com/watch?v=LXb3EKWsInQ' width={"100%"} height={600} />
-                </div>
-              </section> */}
-              <section className="mt-4">
-                <div className="container">
-                  <div className="row">
-                    {/* Main content START */}
-                    <div className="col-12">
-                      <div className="card shadow rounded-2 p-0 mt-n5">
-                        {/* Tabs START */}
-                        <div className="card-header border-bottom px-4 pt-3 pb-0">
-                          <ul
-                            className="nav nav-bottom-line py-0"
-                            id="course-pills-tab"
-                            role="tablist"
-                          >
-                            {/* Tab item */}
-                            <li className="nav-item me-2 me-sm-4" role="presentation">
-                              <button className="nav-link mb-2 mb-md-0 active" id="course-pills-tab-1" data-bs-toggle="pill" data-bs-target="#course-pills-1" type="button" role="tab" aria-controls="course-pills-1" aria-selected="true">
-                                Course Lectures
-                              </button>
-                            </li>
-                            {/* Tab item */}
-                            <li className="nav-item me-2 me-sm-4" role="presentation">
-                              <button
-                                className="nav-link mb-2 mb-md-0"
-                                id="course-pills-tab-2"
-                                data-bs-toggle="pill"
-                                data-bs-target="#course-pills-2"
-                                type="button"
-                                role="tab"
-                                aria-controls="course-pills-2"
-                                aria-selected="false"
-                              >
-                                Notes
-                              </button>
-                            </li>
-                            {/* Tab item */}
-                            <li className="nav-item me-2 me-sm-4" role="presentation">
-                              <button
-                                className="nav-link mb-2 mb-md-0"
-                                id="course-pills-tab-3"
-                                data-bs-toggle="pill"
-                                data-bs-target="#course-pills-3"
-                                type="button"
-                                role="tab"
-                                aria-controls="course-pills-3"
-                                aria-selected="false"
-                              >
-                                Discussion
-                              </button>
-                            </li>
+// 	const handleAddNote = (event) => {
+// 		event.preventDefault();
+// 		const title = event.target.title.value;
+// 		const content = event.target.content.value;
+// 		const newNote = { id: notes.length + 1, title, content };
+// 		setNotes([...notes, newNote]);
+// 		setShowNoteModal(false);
+// 	};
 
-                            <li className="nav-item me-2 me-sm-4" role="presentation">
-                              <button
-                                className="nav-link mb-2 mb-md-0"
-                                id="course-pills-tab-4"
-                                data-bs-toggle="pill"
-                                data-bs-target="#course-pills-4"
-                                type="button"
-                                role="tab"
-                                aria-controls="course-pills-4"
-                                aria-selected="false"
-                              >
-                                Leave a Review
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
-                        {/* Tabs END */}
-                        {/* Tab contents START */}
-                        <div className="card-body p-sm-4">
-                          <div className="tab-content" id="course-pills-tabContent">
-                            {/* Content START */}
-                            <div
-                              className="tab-pane fade show active"
-                              id="course-pills-1"
-                              role="tabpanel"
-                              aria-labelledby="course-pills-tab-1"
-                            >
-                              {/* Accordion START */}
-                              <div
-                                className="accordion accordion-icon accordion-border"
-                                id="accordionExample2"
-                              >
+// 	const handleEditNote = (note) => {
+// 		setEditingNote(note);
+// 		setShowEditNoteModal(true);
+// 	};
 
-                                <div className="progress mb-3">
-                                  <div
-                                    className="progress-bar"
-                                    role="progressbar"
-                                    style={{ width: `${25}%` }}
-                                    aria-valuenow={25}
-                                    aria-valuemin={0}
-                                    aria-valuemax={100}
-                                  >
-                                    25%
-                                  </div>
-                                </div>
-                                {/* Item */}
-                                <div className="accordion-item mb-3">
-                                  <h6 className="accordion-header font-base" id="heading-1">
-                                    <button
-                                      className="accordion-button fw-bold rounded d-sm-flex d-inline-block collapsed"
-                                      type="button"
-                                      data-bs-toggle="collapse"
-                                      data-bs-target="#collapse-1"
-                                      aria-expanded="true"
-                                      aria-controls="collapse-1"
-                                    >
-                                      Introduction of Digital Marketing
-                                      <span className="small ms-0 ms-sm-2">
-                                        (3 Lectures)
-                                      </span>
-                                    </button>
-                                  </h6>
-                                  <div
-                                    id="collapse-1"
-                                    className="accordion-collapse collapse show"
-                                    aria-labelledby="heading-1"
-                                    data-bs-parent="#accordionExample2"
-                                  >
-                                    <div className="accordion-body mt-3">
-                                      {/* Course lecture */}
-                                      <div className="d-flex justify-content-between align-items-center">
-                                        <div className="position-relative d-flex align-items-center">
-                                          <a
-                                            href="#"
-                                            className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static"
-                                          >
-                                            <i className="fas fa-play me-0" />
-                                          </a>
-                                          <span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-                                            Introduction
-                                          </span>
-                                        </div>
-                                        <div className='d-flex'>
-                                          <p className="mb-0">3m 9s</p>
-                                          <input type="checkbox" className='form-check-input' name="" id="" />
-                                        </div>
-                                      </div>
-                                      <hr /> {/* Divider */}
-                                      {/* Course lecture */}
-                                      <div className="d-flex justify-content-between align-items-center">
-                                        <div className="position-relative d-flex align-items-center">
-                                          <a
-                                            href="#"
-                                            className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static"
-                                          >
-                                            <i className="fas fa-play me-0" />
-                                          </a>
-                                          <span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
+// 	const handleUpdateNote = (event) => {
+// 		event.preventDefault();
+// 		const updatedTitle = event.target.title.value;
+// 		const updatedContent = event.target.content.value;
+// 		const updatedNotes = notes.map((note) =>
+// 			note.id === editingNote.id
+// 				? { ...note, title: updatedTitle, content: updatedContent }
+// 				: note
+// 		);
+// 		setNotes(updatedNotes);
+// 		setShowEditNoteModal(false);
+// 		setEditingNote(null);
+// 	};
 
-                                            What is Digital Marketing What is Digital
-                                            Marketing
-                                          </span>
-                                        </div>
-                                        <p className="mb-0 text-truncate">15m 10s</p>
-                                      </div>
-                                      <hr /> {/* Divider */}
-                                      {/* Course lecture */}
-                                      <div className="d-flex justify-content-between align-items-center">
-                                        <div className="position-relative d-flex align-items-center">
-                                          <a
-                                            href="#"
-                                            className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static"
-                                          >
-                                            <i className="fas fa-lock me-0" />
-                                          </a>
-                                          <span className="d-inline-block text-truncate text-muted ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-                                            Type of Digital Marketing
-                                          </span>
-                                        </div>
-                                        <p className="mb-0">18m 10s</p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                {/* Item */}
-                                <div className="accordion-item mb-3">
-                                  <h6 className="accordion-header font-base" id="heading-2">
-                                    <button
-                                      className="accordion-button fw-bold collapsed rounded d-sm-flex d-inline-block"
-                                      type="button"
-                                      data-bs-toggle="collapse"
-                                      data-bs-target="#collapse-2"
-                                      aria-expanded="false"
-                                      aria-controls="collapse-2"
-                                    >
-                                      Customer Life cycle
-                                      <span className="small ms-0 ms-sm-2">
-                                        (4 Lectures)
-                                      </span>
-                                    </button>
-                                  </h6>
-                                  <div
-                                    id="collapse-2"
-                                    className="accordion-collapse collapse"
-                                    aria-labelledby="heading-2"
-                                    data-bs-parent="#accordionExample2"
-                                  >
-                                    {/* Accordion body START */}
-                                    <div className="accordion-body mt-3">
-                                      {/* Course lecture */}
-                                      <div className="d-flex justify-content-between align-items-center">
-                                        <div className="position-relative d-flex align-items-center">
-                                          <a
-                                            href="#"
-                                            className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static"
-                                          >
-                                            <i className="fas fa-play me-0" />
-                                          </a>
-                                          <span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-                                            What is Digital Marketing
-                                          </span>
-                                        </div>
-                                        <p className="mb-0">11m 20s</p>
-                                      </div>
-                                      <hr /> {/* Divider */}
-                                      {/* Course lecture */}
-                                      <div className="d-flex justify-content-between align-items-center">
-                                        <div className="position-relative d-flex align-items-center">
-                                          <a
-                                            href="#"
-                                            className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static"
-                                          >
-                                            <i className="fas fa-play me-0" />
-                                          </a>
-                                          <span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-                                            15 Tips for Writing Magnetic Headlines
-                                          </span>
-                                        </div>
-                                        <p className="mb-0 text-truncate">25m 20s</p>
-                                      </div>
-                                      <hr /> {/* Divider */}
-                                      {/* Course lecture */}
-                                      <div className="d-flex justify-content-between align-items-center">
-                                        <div className="position-relative d-flex align-items-center">
-                                          <a
-                                            href="#"
-                                            className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static"
-                                          >
-                                            <i className="fas fa-play me-0" />
-                                          </a>
-                                          <span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-sm-200px w-md-400px">
-                                            How to Write Like Your Customers Talk
-                                          </span>
-                                        </div>
-                                        <p className="mb-0">11m 30s</p>
-                                      </div>
-                                      <hr /> {/* Divider */}
-                                      {/* Course lecture */}
-                                      <div className="d-flex justify-content-between align-items-center">
-                                        <div className="position-relative d-flex align-items-center">
-                                          <div>
-                                            <a
-                                              href="#"
-                                              className="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static"
-                                              data-bs-toggle="modal"
-                                              data-bs-target="#exampleModal"
-                                            >
-                                              <i className="fas fa-play me-0" />
-                                            </a>
-                                          </div>
-                                          <div className="row g-sm-0 align-items-center">
-                                            <div className="col-sm-6">
-                                              <span className="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-100px w-md-400px">
-                                                How to Flip Features Into Benefits
-                                              </span>
-                                            </div>
-                                            <div className="col-sm-6">
-                                              <span className="badge text-bg-orange ms-2 ms-md-0">
-                                                <i className="fas fa-lock fa-fw me-1" />
-                                                Premium
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        <p className="mb-0 d-inline-block text-truncate w-70px w-sm-60px">
-                                          35m 30s
-                                        </p>
-                                      </div>
-                                    </div>
-                                    {/* Accordion body END */}
-                                  </div>
-                                </div>
+// 	const handleDeleteNote = (id) => {
+// 		const updatedNotes = notes.filter((note) => note.id !== id);
+// 		setNotes(updatedNotes);
+// 	};
 
+// 	const handleAskQuestion = (event) => {
+// 		event.preventDefault();
+// 		const question = event.target.question.value;
+// 		const newDiscussion = {
+// 			id: discussions.length + 1,
+// 			user: "Current User",
+// 			avatar: "/placeholder.svg?height=40&width=40",
+// 			question,
+// 			time: "Just now",
+// 			replies: [],
+// 		};
+// 		setDiscussions([...discussions, newDiscussion]);
+// 		setShowAskQuestionModal(false);
+// 	};
 
-                              </div>
-                              {/* Accordion END */}
-                            </div>
+// 	const handleJoinConversation = (discussion) => {
+// 		setSelectedDiscussion(discussion);
+// 		setShowJoinConversationModal(true);
+// 	};
 
-                            <div
-                              className="tab-pane fade"
-                              id="course-pills-2"
-                              role="tabpanel"
-                              aria-labelledby="course-pills-tab-2"
-                            >
-                              <div className="card">
-                                <div className="card-header border-bottom p-0 pb-3">
-                                  <div className="d-sm-flex justify-content-between align-items-center">
-                                    <h4 className="mb-0 p-3">All Notes</h4>
-                                    {/* Add Note Modal */}
-                                    <button type="button" className="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#exampleModal" >
-                                      Add Note <i className='fas fa-pen'></i>
-                                    </button>
-                                    <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                      <div className="modal-dialog modal-dialog-centered">
-                                        <div className="modal-content">
-                                          <div className="modal-header">
-                                            <h5 className="modal-title" id="exampleModalLabel">
-                                              Add New Note <i className='fas fa-pen'></i>
-                                            </h5>
-                                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-                                          </div>
-                                          <div className="modal-body">
-                                            <form>
-                                              <div className="mb-3">
-                                                <label htmlFor="exampleInputEmail1" className="form-label">
-                                                  Note Title
-                                                </label>
-                                                <input type="text" className="form-control" />
-                                              </div>
-                                              <div className="mb-3">
-                                                <label htmlFor="exampleInputPassword1" className="form-label">
-                                                  Note Content
-                                                </label>
-                                                <textarea className='form-control' name="" id="" cols="30" rows="10"></textarea>
-                                              </div>
-                                              <button type="button" className="btn btn-secondary me-2" data-bs-dismiss="modal" ><i className='fas fa-arrow-left'></i> Close</button>
-                                              <button type="submit" className="btn btn-primary">Save Note <i className='fas fa-check-circle'></i></button>
-                                            </form>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="card-body p-0 pt-3">
-                                  {/* Note item start */}
-                                  <div className="row g-4 p-3">
-                                    <div className="col-sm-11 col-xl-11 shadow p-3 m-3 rounded">
-                                      <h5> What is Digital Marketing What is Digital Marketing</h5>
-                                      <p>
-                                        Arranging rapturous did believe him all had supported.
-                                        Supposing so be resolving breakfast am or perfectly.
-                                        It drew a hill from me. Valley by oh twenty direct me
-                                        so. Departure defective arranging rapturous did
-                                        believe him all had supported. Family months lasted
-                                        simple set nature vulgar him. Picture for attempt joy
-                                        excited ten carried manners talking how. Family months
-                                        lasted simple set nature vulgar him. Picture for
-                                        attempt joy excited ten carried manners talking how.
-                                      </p>
-                                      {/* Buttons */}
-                                      <div className="hstack gap-3 flex-wrap">
-                                        <a onClick={handleNoteShow} className="btn btn-success mb-0">
-                                          <i className="bi bi-pencil-square me-2" /> Edit
-                                        </a>
-                                        <a href="#" className="btn btn-danger mb-0">
-                                          <i className="bi bi-trash me-2" /> Delete
-                                        </a>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <hr />
-                                </div>
-                              </div>
-                            </div>
-                            <div
-                              className="tab-pane fade"
-                              id="course-pills-3"
-                              role="tabpanel"
-                              aria-labelledby="course-pills-tab-3"
-                            >
-                              <div className="card">
-                                {/* Card header */}
-                                <div className="card-header border-bottom p-0 pb-3">
-                                  {/* Title */}
-                                  <h4 className="mb-3 p-3">Discussion</h4>
-                                  <form className="row g-4 p-3">
-                                    {/* Search */}
-                                    <div className="col-sm-6 col-lg-9">
-                                      <div className="position-relative">
-                                        <input className="form-control pe-5 bg-transparent" type="search" placeholder="Search" aria-label="Search" />
-                                        <button className="bg-transparent p-2 position-absolute top-50 end-0 translate-middle-y border-0 text-primary-hover text-reset" type="submit">
-                                          <i className="fas fa-search fs-6 " />
-                                        </button>
-                                      </div>
-                                    </div>
-                                    <div className="col-sm-6 col-lg-3">
-                                      <a
-                                        href="#"
-                                        className="btn btn-primary mb-0 w-100"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalCreatePost"
-                                      >
-                                        Ask Question
-                                      </a>
-                                    </div>
-                                  </form>
-                                </div>
-                                {/* Card body */}
-                                <div className="card-body p-0 pt-3">
-                                  <div className="vstack gap-3 p-3">
-                                    {/* Question item START */}
-                                    <div className="shadow rounded-3 p-3">
-                                      <div className="d-sm-flex justify-content-sm-between mb-3">
-                                        <div className="d-flex align-items-center">
-                                          <div className="avatar avatar-sm flex-shrink-0">
-                                            <img
-                                              src="https://geeksui.codescandy.com/geeks/assets/images/avatar/avatar-3.jpg"
-                                              className="avatar-img rounded-circle"
-                                              alt="avatar"
-                                              style={{ width: "60px", height: "60px", borderRadius: "50%", objectFit: "cover" }}
-                                            />
-                                          </div>
-                                          <div className="ms-2">
-                                            <h6 className="mb-0">
-                                              <a href="#" className='text-decoration-none text-dark'>Angelina Poi</a>
-                                            </h6>
-                                            <small>Asked 10 Hours ago</small>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <h5>How can i fix this bug?</h5>
-                                      <button className='btn btn-primary btn-sm mb-3 mt-3' onClick={handleConversationShow}>Join Conversation <i className='fas fa-arrow-right'></i></button>
-                                    </div>
+// 	const handleReply = (event) => {
+// 		event.preventDefault();
+// 		const replyContent = event.target.reply.value;
+// 		const updatedDiscussions = discussions.map((disc) => {
+// 			if (disc.id === selectedDiscussion.id) {
+// 				return {
+// 					...disc,
+// 					replies: [
+// 						...disc.replies,
+// 						{
+// 							id: disc.replies.length + 1,
+// 							user: "Current User",
+// 							avatar: "/placeholder.svg?height=40&width=40",
+// 							content: replyContent,
+// 							time: "Just now",
+// 						},
+// 					],
+// 				};
+// 			}
+// 			return disc;
+// 		});
+// 		setDiscussions(updatedDiscussions);
+// 		setShowJoinConversationModal(false);
+// 	};
 
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div
-                              className="tab-pane fade"
-                              id="course-pills-4"
-                              role="tabpanel"
-                              aria-labelledby="course-pills-tab-4"
-                            >
-                              <div className="card">
-                                {/* Card header */}
-                                <div className="card-header border-bottom p-0 pb-3">
-                                  {/* Title */}
-                                  <h4 className="mb-3 p-3">Leave a Review</h4>
-                                  <div className="mt-2">
-                                    <form className="row g-3 p-3">
+// 	const Modal = ({ isOpen, onClose, title, children }) => {
+// 		if (!isOpen) return null;
+// 		return (
+// 			<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+// 				<div className="bg-white rounded-lg w-full max-w-md">
+// 					<div className="flex justify-between items-center p-4 border-b">
+// 						<h3 className="text-lg font-semibold">{title}</h3>
+// 						<button
+// 							onClick={onClose}
+// 							className="text-gray-500 hover:text-gray-700"
+// 						>
+// 							<X size={24} />
+// 						</button>
+// 					</div>
+// 					<div className="p-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+// 						{children}
+// 					</div>
+// 				</div>
+// 			</div>
+// 		);
+// 	};
 
-                                      {/* Rating */}
-                                      <div className="col-12 bg-light-input">
-                                        <select
-                                          id="inputState2"
-                                          className="form-select js-choice"
-                                        >
-                                          <option value={1}>★☆☆☆☆ (1/5)</option>
-                                          <option value={2}>★★☆☆☆ (2/5)</option>
-                                          <option value={3}>★★★☆☆ (3/5)</option>
-                                          <option value={4}>★★★★☆ (4/5)</option>
-                                          <option value={5}>★★★★★ (5/5)</option>
-                                        </select>
-                                      </div>
-                                      {/* Message */}
-                                      <div className="col-12 bg-light-input">
-                                        <textarea
-                                          className="form-control"
-                                          id="exampleFormControlTextarea1"
-                                          placeholder="Your review"
-                                          rows={3}
-                                          defaultValue={""}
-                                        />
-                                      </div>
-                                      {/* Button */}
-                                      <div className="col-12">
-                                        <button type="submit" className="btn btn-primary mb-0">
-                                          Post Review
-                                        </button>
-                                      </div>
-                                    </form>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            </div>
-          </div>
-        </div>
-      </section>
+// 	const memoizedVideoPlayer = useMemo(
+// 		() => (
+// 			<div className="aspect-video">
+// 				{isLoading ? (
+// 					<Skeleton height="100%" baseColor="#acaaf9" />
+// 				) : (
+// 					<VideoPlayer videoUrl={currentVideo?.url || ""} />
+// 				)}
+// 			</div>
+// 		),
+// 		[currentVideo?.url, isLoading]
+// 	);
 
+// 	return (
+// 		<div className="container mx-auto flex flex-col lg:flex-row gap-4">
+// 			<div className="lg:w-2/3">
+// 				{memoizedVideoPlayer}
+// 				{isLoading ? (
+// 					<>
+// 						<Skeleton width={300} height={24} className="mt-3 mb-2" />
+// 						<Skeleton count={3} />
+// 					</>
+// 				) : (
+// 					<>
+// 						<h1 className="text-3xl mt-3 font-bold mb-2">
+// 							{currentVideo?.title || course?.course?.title}
+// 						</h1>
+// 						<p className="text-gray-600 text-sm">
+// 							{currentVideo?.description || course?.course?.description}
+// 						</p>
+// 					</>
+// 				)}
+// 			</div>
+// 			<div className="lg:w-1/3 bg-white shadow-md overflow-hidden">
+// 				<div className="border-b">
+// 					<nav className="flex">
+// 						{["lectures", "notes", "discussion", "review"].map((tab) => (
+// 							<button
+// 								key={tab}
+// 								className={`px-4 py-4 text-sm font-medium ${
+// 									activeTab === tab
+// 										? "text-blue-600 border-b-2 border-blue-600"
+// 										: "text-gray-500 hover:text-gray-700"
+// 								}`}
+// 								onClick={() => setActiveTab(tab)}
+// 							>
+// 								{tab.charAt(0).toUpperCase() + tab.slice(1)}
+// 							</button>
+// 						))}
+// 					</nav>
+// 				</div>
 
+// 				<div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+// 					{isLoading ? (
+// 						<Skeleton count={8} />
+// 					) : (
+// 						<>
+// 							{activeTab === "lectures" && (
+// 								<div>
+// 									<h2 className="text-xl font-semibold mb-4">Course Content</h2>
+// 									<div className="mb-4">
+// 										<div className="w-full bg-gray-200 rounded-full h-2.5">
+// 											<div
+// 												className="bg-blue-600 h-2.5 rounded-full"
+// 												style={{ width: `${calculateProgress()}%` }}
+// 											></div>
+// 										</div>
+// 										<p className="text-sm text-gray-600 mt-1">
+// 											{completedLectures.size} /{" "}
+// 											{course?.curriculum.reduce(
+// 												(acc, section) => acc + section.variant_items.length,
+// 												0
+// 											)}{" "}
+// 											completed
+// 										</p>
+// 									</div>
+// 									{course?.curriculum?.map((section, index) => (
+// 										<div key={index} className="mb-4">
+// 											<button
+// 												className="flex justify-between items-center w-full p-4 bg-gray-100 rounded-lg"
+// 												onClick={() =>
+// 													setExpandedSection(
+// 														expandedSection === section.variant_id
+// 															? null
+// 															: section.variant_id
+// 													)
+// 												}
+// 											>
+// 												<span className="font-semibold">{section.title}</span>
+// 												{expandedSection === section.variant_id ? (
+// 													<ChevronUp size={20} />
+// 												) : (
+// 													<ChevronDown size={20} />
+// 												)}
+// 											</button>
+// 											{expandedSection === section.variant_id && (
+// 												<div className="mt-2 space-y-2">
+// 													{section.variant_items?.map(
+// 														(lecture, lectureIndex) => (
+// 															<div
+// 																key={lectureIndex}
+// 																className="flex items-center justify-between p-2 bg-white rounded-lg"
+// 															>
+// 																<div className="flex items-center">
+// 																	{!lecture.preview ? (
+// 																		<Lock
+// 																			className="text-gray-400 mr-2"
+// 																			size={20}
+// 																		/>
+// 																	) : (
+// 																		<button
+// 																			onClick={() => handleVideoChange(lecture)}
+// 																			className="text-blue-600 mr-2"
+// 																		>
+// 																			{currentVideo?.id === lecture.id ? (
+// 																				<Pause size={20} />
+// 																			) : (
+// 																				<Play size={20} />
+// 																			)}
+// 																		</button>
+// 																	)}
+// 																	<span
+// 																		className={
+// 																			!lecture.preview ? "text-gray-400" : ""
+// 																		}
+// 																	>
+// 																		{lecture?.title}
+// 																	</span>
+// 																</div>
+// 																<div className="flex items-center">
+// 																	<span className="text-sm text-gray-500 mr-2">
+// 																		{lecture.duration}
+// 																	</span>
+// 																	<button
+// 																		disabled={!lecture.preview}
+// 																		onClick={() =>
+// 																			handleToggleCompleted(lecture.id)
+// 																		}
+// 																		className={`w-6 h-6 rounded-full border ${
+// 																			completedLectures.has(lecture.id)
+// 																				? "bg-green-500 border-green-500"
+// 																				: "border-gray-300"
+// 																		} flex items-center justify-center`}
+// 																	>
+// 																		{completedLectures.has(lecture.id) && (
+// 																			<CheckCircle
+// 																				className="text-white"
+// 																				size={16}
+// 																			/>
+// 																		)}
+// 																	</button>
+// 																</div>
+// 															</div>
+// 														)
+// 													)}
+// 												</div>
+// 											)}
+// 										</div>
+// 									))}
+// 								</div>
+// 							)}
+// 							{activeTab === "notes" && (
+// 								<div>
+// 									<div className="flex justify-between items-center mb-4">
+// 										<h2 className="text-xl font-semibold">
+// 											Notes for: {currentVideo?.title}
+// 										</h2>
+// 										<button
+// 											onClick={() => setShowNoteModal(true)}
+// 											className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+// 										>
+// 											Add Note <Edit className="inline-block ml-1" size={16} />
+// 										</button>
+// 									</div>
+// 									{notes.map((note) => (
+// 										<div
+// 											key={note.id}
+// 											className="bg-white p-4 rounded-lg shadow mb-4"
+// 										>
+// 											<h3 className="font-semibold mb-2">{note.title}</h3>
+// 											<p className="text-gray-600 mb-4">{note.content}</p>
+// 											<div className="flex space-x-2">
+// 												<button
+// 													onClick={() => handleEditNote(note)}
+// 													className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600"
+// 												>
+// 													<Edit className="inline-block mr-1" size={16} /> Edit
+// 												</button>
+// 												<button
+// 													onClick={() => handleDeleteNote(note.id)}
+// 													className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+// 												>
+// 													<Trash2 className="inline-block mr-1" size={16} />{" "}
+// 													Delete
+// 												</button>
+// 											</div>
+// 										</div>
+// 									))}
+// 								</div>
+// 							)}
+// 							{activeTab === "discussion" && (
+// 								<div>
+// 									<div className="mb-4">
+// 										<input
+// 											type="text"
+// 											placeholder="Search discussions..."
+// 											className="w-full p-2 border rounded-md"
+// 										/>
+// 									</div>
+// 									<button
+// 										onClick={() => setShowAskQuestionModal(true)}
+// 										className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mb-4"
+// 									>
+// 										Ask Question
+// 									</button>
+// 									{discussions.map((discussion) => (
+// 										<div
+// 											key={discussion.id}
+// 											className="bg-white p-4 rounded-lg shadow mb-4"
+// 										>
+// 											<div className="flex items-center mb-2">
+// 												<img
+// 													src={discussion.avatar}
+// 													alt={`${discussion.user} Avatar`}
+// 													className="w-10 h-10 rounded-full mr-2"
+// 												/>
+// 												<div>
+// 													<h3 className="font-semibold">{discussion.user}</h3>
+// 													<p className="text-sm text-gray-500">
+// 														Asked {discussion.time}
+// 													</p>
+// 												</div>
+// 											</div>
+// 											<h4 className="font-semibold mb-2">
+// 												{discussion.question}
+// 											</h4>
+// 											<button
+// 												onClick={() => handleJoinConversation(discussion)}
+// 												className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+// 											>
+// 												Join Conversation{" "}
+// 												<MessageSquare
+// 													className="inline-block ml-1"
+// 													size={16}
+// 												/>
+// 											</button>
+// 										</div>
+// 									))}
+// 								</div>
+// 							)}
+// 							{activeTab === "review" && (
+// 								<div>
+// 									<h2 className="text-xl font-semibold mb-4">Leave a Review</h2>
+// 									<form>
+// 										<div className="mb-4">
+// 											<label className="block text-sm font-medium mb-1">
+// 												Rating
+// 											</label>
+// 											<select className="w-full p-2 border rounded-md">
+// 												<option value="5">★★★★★ (5/5)</option>
+// 												<option value="4">★★★★☆ (4/5)</option>
+// 												<option value="3">★★★☆☆ (3/5)</option>
+// 												<option value="2">★★☆☆☆ (2/5)</option>
+// 												<option value="1">★☆☆☆☆ (1/5)</option>
+// 											</select>
+// 										</div>
+// 										<div className="mb-4">
+// 											<label className="block text-sm font-medium mb-1">
+// 												Your review
+// 											</label>
+// 											<textarea
+// 												className="w-full p-2 border rounded-md"
+// 												rows={4}
+// 												placeholder="Write your review here..."
+// 											></textarea>
+// 										</div>
+// 										<button
+// 											type="submit"
+// 											className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+// 										>
+// 											Post Review
+// 										</button>
+// 									</form>
+// 								</div>
+// 							)}
+// 						</>
+// 					)}
+// 				</div>
+// 			</div>
 
-      {/* Lecture Modal */}
-      <Modal show={null} size='lg' onHide={null}>
-        <Modal.Header closeButton>
-          <Modal.Title>Lesson: Lesson Title</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ReactPlayer url={`url-here`} controls playing width={"100%"} height={"100%"} />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={null}>Close</Button>
-        </Modal.Footer>
-      </Modal>
+// 			<Modal
+// 				isOpen={showNoteModal}
+// 				onClose={() => setShowNoteModal(false)}
+// 				title="Add New Note"
+// 			>
+// 				<form onSubmit={handleAddNote}>
+// 					<div className="mb-4">
+// 						<label
+// 							htmlFor="title"
+// 							className="block text-sm font-medium text-gray-700"
+// 						>
+// 							Note Title
+// 						</label>
+// 						<input
+// 							type="text"
+// 							id="title"
+// 							name="title"
+// 							required
+// 							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+// 						/>
+// 					</div>
+// 					<div className="mb-4">
+// 						<label
+// 							htmlFor="content"
+// 							className="block text-sm font-medium text-gray-700"
+// 						>
+// 							Note Content
+// 						</label>
+// 						<textarea
+// 							id="content"
+// 							name="content"
+// 							rows="3"
+// 							required
+// 							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+// 						></textarea>
+// 					</div>
+// 					<div className="flex justify-end">
+// 						<button
+// 							type="button"
+// 							onClick={() => setShowNoteModal(false)}
+// 							className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+// 						>
+// 							Cancel
+// 						</button>
+// 						<button
+// 							type="submit"
+// 							className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+// 						>
+// 							Save Note
+// 						</button>
+// 					</div>
+// 				</form>
+// 			</Modal>
 
+// 			<Modal
+// 				isOpen={showEditNoteModal}
+// 				onClose={() => setShowEditNoteModal(false)}
+// 				title="Edit Note"
+// 			>
+// 				<form onSubmit={handleUpdateNote}>
+// 					<div className="mb-4">
+// 						<label
+// 							htmlFor="title"
+// 							className="block text-sm font-medium text-gray-700"
+// 						>
+// 							Note Title
+// 						</label>
+// 						<input
+// 							type="text"
+// 							id="title"
+// 							name="title"
+// 							required
+// 							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+// 							defaultValue={editingNote?.title}
+// 						/>
+// 					</div>
+// 					<div className="mb-4">
+// 						<label
+// 							htmlFor="content"
+// 							className="block text-sm font-medium text-gray-700"
+// 						>
+// 							Note Content
+// 						</label>
+// 						<textarea
+// 							id="content"
+// 							name="content"
+// 							rows="3"
+// 							required
+// 							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+// 							defaultValue={editingNote?.content}
+// 						></textarea>
+// 					</div>
+// 					<div className="flex justify-end">
+// 						<button
+// 							type="button"
+// 							onClick={() => setShowEditNoteModal(false)}
+// 							className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+// 						>
+// 							Cancel
+// 						</button>
+// 						<button
+// 							type="submit"
+// 							className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+// 						>
+// 							Save Changes
+// 						</button>
+// 					</div>
+// 				</form>
+// 			</Modal>
 
-      {/* Note Edit Modal */}
-      <Modal show={noteShow} size='lg' onHide={handleNoteClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Note: Note Title</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <form>
-            <div className="mb-3">
-              <label htmlFor="exampleInputEmail1" className="form-label">Note Title</label>
-              <input defaultValue={null} name='title' type="text" className="form-control" />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="exampleInputPassword1" className="form-label">Note Content</label>
-              <textarea onChange={null} defaultValue={null} name='note' className='form-control' cols="30" rows="10"></textarea>
-            </div>
-            <button type="button" className="btn btn-secondary me-2" onClick={null}><i className='fas fa-arrow-left'></i> Close</button>
-            <button type="submit" className="btn btn-primary">Save Note <i className='fas fa-check-circle'></i></button>
-          </form>
-        </Modal.Body>
-      </Modal>
+// 			<Modal
+// 				isOpen={showAskQuestionModal}
+// 				onClose={() => setShowAskQuestionModal(false)}
+// 				title="Ask New Question"
+// 			>
+// 				<form onSubmit={handleAskQuestion}>
+// 					<div className="mb-4">
+// 						<label
+// 							htmlFor="question"
+// 							className="block text-sm font-medium text-gray-700"
+// 						>
+// 							What's your question?
+// 						</label>
+// 						<textarea
+// 							id="question"
+// 							name="question"
+// 							rows="3"
+// 							required
+// 							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+// 						></textarea>
+// 					</div>
+// 					<div className="flex justify-end">
+// 						<button
+// 							type="button"
+// 							onClick={() => setShowAskQuestionModal(false)}
+// 							className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+// 						>
+// 							Close
+// 						</button>
+// 						<button
+// 							type="submit"
+// 							className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+// 						>
+// 							Post Question
+// 						</button>
+// 					</div>
+// 				</form>
+// 			</Modal>
 
-      {/* Note Edit Modal */}
-      <Modal show={ConversationShow} size='lg' onHide={handleConversationClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Lesson: 123</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="border p-2 p-sm-4 rounded-3">
-            <ul className="list-unstyled mb-0" style={{ overflowY: "scroll", height: "500px" }}>
-              <li className="comment-item mb-3">
-                <div className="d-flex">
-                  <div className="avatar avatar-sm flex-shrink-0">
-                    <a href="#">
-                      <img className="avatar-img rounded-circle" src="https://geeksui.codescandy.com/geeks/assets/images/avatar/avatar-3.jpg" style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }} alt="womans image" />
-                    </a>
-                  </div>
-                  <div className="ms-2">
-                    {/* Comment by */}
-                    <div className="bg-light p-3 rounded w-100">
-                      <div className="d-flex w-100 justify-content-center">
-                        <div className="me-2 ">
-                          <h6 className="mb-1 lead fw-bold">
-                            <a href="#!" className='text-decoration-none text-dark'> Louis Ferguson </a><br />
-                            <span style={{ fontSize: "12px", color: "gray" }}>5hrs Ago</span>
-                          </h6>
-                          <p className="mb-0 mt-3  ">Removed demands expense account
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+// 			<Modal
+// 				isOpen={showJoinConversationModal}
+// 				onClose={() => setShowJoinConversationModal(false)}
+// 				title="Join Conversation"
+// 			>
+// 				<div className="mb-4 max-h-60 overflow-y-auto custom-scrollbar">
+// 					<div className="flex mb-4">
+// 						<img
+// 							src={selectedDiscussion?.avatar}
+// 							alt="User Avatar"
+// 							className="w-10 h-10 rounded-full mr-2"
+// 						/>
+// 						<div>
+// 							<h6 className="font-semibold">{selectedDiscussion?.user}</h6>
+// 							<p className="text-sm text-gray-500">
+// 								{selectedDiscussion?.time}
+// 							</p>
+// 							<p className="mt-1">{selectedDiscussion?.question}</p>
+// 						</div>
+// 					</div>
+// 					{selectedDiscussion?.replies.map((reply) => (
+// 						<div key={reply.id} className="flex mb-4 ml-8">
+// 							<img
+// 								src={reply.avatar}
+// 								alt="User Avatar"
+// 								className="w-8 h-8 rounded-full mr-2"
+// 							/>
+// 							<div>
+// 								<h6 className="font-semibold">{reply.user}</h6>
+// 								<p className="text-sm text-gray-500">{reply.time}</p>
+// 								<p className="mt-1">{reply.content}</p>
+// 							</div>
+// 						</div>
+// 					))}
+// 				</div>
+// 				<form onSubmit={handleReply}>
+// 					<div className="mb-4">
+// 						<label
+// 							htmlFor="reply"
+// 							className="block text-sm font-medium text-gray-700"
+// 						>
+// 							Your reply
+// 						</label>
+// 						<textarea
+// 							id="reply"
+// 							name="reply"
+// 							rows="3"
+// 							required
+// 							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+// 							placeholder="What's your reply?"
+// 						></textarea>
+// 					</div>
+// 					<div className="flex justify-end">
+// 						<button
+// 							type="submit"
+// 							className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+// 						>
+// 							Post Reply
+// 						</button>
+// 					</div>
+// 				</form>
+// 			</Modal>
+// 		</div>
+// 	);
+// }
 
-                  </div>
-                </div>
-              </li>
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useParams } from "react-router-dom";
+import {
+	Play,
+	Pause,
+	Lock,
+	CheckCircle,
+	ChevronDown,
+	ChevronUp,
+	Edit,
+	Trash2,
+	MessageSquare,
+	X,
+} from "lucide-react";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import useAxios from "../../utils/useAxios";
+import UserData from "../plugins/UserData";
+import VideoPlayer from "./Partials/VideoPlayer";
 
-              <li className="comment-item mb-3">
-                <div className="d-flex">
-                  <div className="avatar avatar-sm flex-shrink-0">
-                    <a href="#">
-                      <img className="avatar-img rounded-circle" src="https://geeksui.codescandy.com/geeks/assets/images/avatar/avatar-3.jpg" style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }} alt="womans image" />
-                    </a>
-                  </div>
-                  <div className="ms-2">
-                    {/* Comment by */}
-                    <div className="bg-light p-3 rounded w-100">
-                      <div className="d-flex w-100 justify-content-center">
-                        <div className="me-2 ">
-                          <h6 className="mb-1 lead fw-bold">
-                            <a href="#!" className='text-decoration-none text-dark'> Louis Ferguson </a><br />
-                            <span style={{ fontSize: "12px", color: "gray" }}>5hrs Ago</span>
-                          </h6>
-                          <p className="mb-0 mt-3  ">Removed demands expense account from the debby building in a hall  town tak with
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+export default function CourseDetail() {
+	const [course, setCourse] = useState(null);
+	const [currentVideo, setCurrentVideo] = useState(null);
+	const [expandedSection, setExpandedSection] = useState(null);
+	const [completedLectures, setCompletedLectures] = useState(new Set());
+	const [activeTab, setActiveTab] = useState("lectures");
+	const [notes, setNotes] = useState([]);
+	const [discussions, setDiscussions] = useState([]);
+	const [showNoteModal, setShowNoteModal] = useState(false);
+	const [showEditNoteModal, setShowEditNoteModal] = useState(false);
+	const [editingNote, setEditingNote] = useState(null);
+	const [showAskQuestionModal, setShowAskQuestionModal] = useState(false);
+	const [showJoinConversationModal, setShowJoinConversationModal] =
+		useState(false);
+	const [selectedDiscussion, setSelectedDiscussion] = useState(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [key, setKey] = useState(0);
 
-                  </div>
-                </div>
-              </li>
+	const param = useParams();
 
-              <li className="comment-item mb-3">
-                <div className="d-flex">
-                  <div className="avatar avatar-sm flex-shrink-0">
-                    <a href="#">
-                      <img className="avatar-img rounded-circle" src="https://geeksui.codescandy.com/geeks/assets/images/avatar/avatar-3.jpg" style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }} alt="womans image" />
-                    </a>
-                  </div>
-                  <div className="ms-2">
-                    {/* Comment by */}
-                    <div className="bg-light p-3 rounded w-100">
-                      <div className="d-flex w-100 justify-content-center">
-                        <div className="me-2 ">
-                          <h6 className="mb-1 lead fw-bold">
-                            <a href="#!" className='text-decoration-none text-dark'> Louis Ferguson </a><br />
-                            <span style={{ fontSize: "12px", color: "gray" }}>5hrs Ago</span>
-                          </h6>
-                          <p className="mb-0 mt-3  ">Removed demands expense account
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+	const fetchCourseDetail = useCallback(async () => {
+		setIsLoading(true);
+		try {
+			const res = await useAxios().get(
+				`student/course-detail/${UserData()?.user_id}/${param.enrollment_id}/`
+			);
+			setCourse(res.data);
+			setCurrentVideo(res.data?.curriculum[0]?.variant_items[0]);
+		} catch (error) {
+			console.error("Error fetching course details:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [param.enrollment_id]);
 
-                  </div>
-                </div>
-              </li>
+	useEffect(() => {
+		fetchCourseDetail();
+	}, [fetchCourseDetail]);
 
-              <li className="comment-item mb-3">
-                <div className="d-flex">
-                  <div className="avatar avatar-sm flex-shrink-0">
-                    <a href="#">
-                      <img className="avatar-img rounded-circle" src="https://geeksui.codescandy.com/geeks/assets/images/avatar/avatar-3.jpg" style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" }} alt="womans image" />
-                    </a>
-                  </div>
-                  <div className="ms-2">
-                    {/* Comment by */}
-                    <div className="bg-light p-3 rounded w-100">
-                      <div className="d-flex w-100 justify-content-center">
-                        <div className="me-2 ">
-                          <h6 className="mb-1 lead fw-bold">
-                            <a href="#!" className='text-decoration-none text-dark'> Louis Ferguson </a><br />
-                            <span style={{ fontSize: "12px", color: "gray" }}>5hrs Ago</span>
-                          </h6>
-                          <p className="mb-0 mt-3  ">Removed demands expense account
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+	const handleVideoChange = useCallback((video) => {
+		setCurrentVideo(video);
+		setKey((prevKey) => prevKey + 1);
+	}, []);
 
-                  </div>
-                </div>
-              </li>
-            </ul>
+	const handleToggleCompleted = useCallback((lectureId) => {
+		setCompletedLectures((prev) => {
+			const newSet = new Set(prev);
+			if (newSet.has(lectureId)) {
+				newSet.delete(lectureId);
+			} else {
+				newSet.add(lectureId);
+			}
+			return newSet;
+		});
+	}, []);
 
-            <form class="w-100 d-flex">
-              <textarea name='message' class="one form-control pe-4 bg-light w-75" id="autoheighttextarea" rows="2" placeholder="What's your question?"></textarea>
-              <button class="btn btn-primary ms-2 mb-0 w-25" type="button">Post <i className='fas fa-paper-plane'></i></button>
-            </form>
+	const calculateProgress = useCallback(() => {
+		if (!course) return 0;
+		const totalLectures = course.curriculum.reduce(
+			(acc, section) => acc + section.variant_items.length,
+			0
+		);
+		return (completedLectures.size / totalLectures) * 100;
+	}, [course, completedLectures]);
 
-            <form class="w-100">
-              <input name='title' type="text" className="form-control mb-2" placeholder='Question Title' />
-              <textarea name='message' class="one form-control pe-4 mb-2 bg-light" id="autoheighttextarea" rows="5" placeholder="What's your question?"></textarea>
-              <button class="btn btn-primary mb-0 w-25" type="button">Post <i className='fas fa-paper-plane'></i></button>
-            </form>
+	const handleAddNote = (event) => {
+		event.preventDefault();
+		const title = event.target.title.value;
+		const content = event.target.content.value;
+		const newNote = { id: notes.length + 1, title, content };
+		setNotes([...notes, newNote]);
+		setShowNoteModal(false);
+	};
 
-          </div>
-        </Modal.Body>
-      </Modal>
+	const handleEditNote = (note) => {
+		setEditingNote(note);
+		setShowEditNoteModal(true);
+	};
 
-      <BaseFooter />
-    </>
-  )
+	const handleUpdateNote = (event) => {
+		event.preventDefault();
+		const updatedTitle = event.target.title.value;
+		const updatedContent = event.target.content.value;
+		const updatedNotes = notes.map((note) =>
+			note.id === editingNote.id
+				? { ...note, title: updatedTitle, content: updatedContent }
+				: note
+		);
+		setNotes(updatedNotes);
+		setShowEditNoteModal(false);
+		setEditingNote(null);
+	};
+
+	const handleDeleteNote = (id) => {
+		const updatedNotes = notes.filter((note) => note.id !== id);
+		setNotes(updatedNotes);
+	};
+
+	const handleAskQuestion = (event) => {
+		event.preventDefault();
+		const question = event.target.question.value;
+		const newDiscussion = {
+			id: discussions.length + 1,
+			user: "Current User",
+			avatar: "/placeholder.svg?height=40&width=40",
+			question,
+			time: "Just now",
+			replies: [],
+		};
+		setDiscussions([...discussions, newDiscussion]);
+		setShowAskQuestionModal(false);
+	};
+
+	const handleJoinConversation = (discussion) => {
+		setSelectedDiscussion(discussion);
+		setShowJoinConversationModal(true);
+	};
+
+	const handleReply = (event) => {
+		event.preventDefault();
+		const replyContent = event.target.reply.value;
+		const updatedDiscussions = discussions.map((disc) => {
+			if (disc.id === selectedDiscussion.id) {
+				return {
+					...disc,
+					replies: [
+						...disc.replies,
+						{
+							id: disc.replies.length + 1,
+							user: "Current User",
+							avatar: "/placeholder.svg?height=40&width=40",
+							content: replyContent,
+							time: "Just now",
+						},
+					],
+				};
+			}
+			return disc;
+		});
+		setDiscussions(updatedDiscussions);
+		setShowJoinConversationModal(false);
+	};
+
+	const Modal = ({ isOpen, onClose, title, children }) => {
+		if (!isOpen) return null;
+		return (
+			<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+				<div className="bg-white rounded-lg w-full max-w-md">
+					<div className="flex justify-between items-center p-4 border-b">
+						<h3 className="text-lg font-semibold">{title}</h3>
+						<button
+							onClick={onClose}
+							className="text-gray-500 hover:text-gray-700"
+						>
+							<X size={24} />
+						</button>
+					</div>
+					<div className="p-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+						{children}
+					</div>
+				</div>
+			</div>
+		);
+	};
+
+	const memoizedVideoPlayer = useMemo(
+		() => (
+			<div className="aspect-video">
+				{isLoading ? (
+					<Skeleton height="100%" />
+				) : (
+					<VideoPlayer
+						key={currentVideo?.id}
+						videoUrl={currentVideo?.url || ""}
+					/>
+				)}
+			</div>
+		),
+		[currentVideo?.id, currentVideo?.url, isLoading]
+	);
+
+	return (
+		<div className="container mx-auto flex flex-col lg:flex-row gap-4">
+			<div className="lg:w-2/3">
+				{memoizedVideoPlayer}
+				{isLoading ? (
+					<>
+						<Skeleton width={300} height={24} className="mt-3 mb-2" />
+						<Skeleton count={3} />
+					</>
+				) : (
+					<>
+						<h1 className="text-3xl mt-3 font-bold mb-2">
+							{currentVideo?.title || course?.course?.title}
+						</h1>
+						<p className="text-gray-600 text-sm">
+							{currentVideo?.description || course?.course?.description}
+						</p>
+					</>
+				)}
+			</div>
+			<div className="lg:w-1/3 bg-white shadow-md rounded-sm overflow-hidden">
+				<div className="border-b">
+					<nav className="flex">
+						{["lectures", "notes", "discussion", "review"].map((tab) => (
+							<button
+								key={tab}
+								className={`px-4 py-4 text-sm font-medium ${
+									activeTab === tab
+										? "text-blue-600 border-b-2 border-blue-600"
+										: "text-gray-500 hover:text-gray-700"
+								}`}
+								onClick={() => setActiveTab(tab)}
+							>
+								{tab.charAt(0).toUpperCase() + tab.slice(1)}
+							</button>
+						))}
+					</nav>
+				</div>
+
+				<div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+					{isLoading ? (
+						<Skeleton count={10} />
+					) : (
+						<>
+							{activeTab === "lectures" && (
+								<div>
+									<h2 className="text-xl font-semibold mb-4">Course Content</h2>
+									<div className="mb-4">
+										<div className="w-full bg-gray-200 rounded-full h-2.5">
+											<div
+												className="bg-blue-600 h-2.5 rounded-full"
+												style={{ width: `${calculateProgress()}%` }}
+											></div>
+										</div>
+										<p className="text-sm text-gray-600 mt-1">
+											{completedLectures.size} /{" "}
+											{course?.curriculum.reduce(
+												(acc, section) => acc + section.variant_items.length,
+												0
+											)}{" "}
+											completed
+										</p>
+									</div>
+									{course?.curriculum?.map((section, index) => (
+										<div key={index} className="mb-4">
+											<button
+												className="flex justify-between items-center w-full p-4 bg-gray-100 rounded-lg"
+												onClick={() =>
+													setExpandedSection(
+														expandedSection === section.variant_id
+															? null
+															: section.variant_id
+													)
+												}
+											>
+												<span className="font-semibold">{section.title}</span>
+												{expandedSection === section.variant_id ? (
+													<ChevronUp size={20} />
+												) : (
+													<ChevronDown size={20} />
+												)}
+											</button>
+											{expandedSection === section.variant_id && (
+												<div className="mt-2 space-y-2">
+													{section.variant_items?.map(
+														(lecture, lectureIndex) => (
+															<div
+																key={lectureIndex}
+																className="flex items-center justify-between p-2 bg-white rounded-lg"
+															>
+																<div className="flex items-center">
+																	{!lecture.preview ? (
+																		<Lock
+																			className="text-gray-400 mr-2"
+																			size={20}
+																		/>
+																	) : (
+																		<button
+																			onClick={() => handleVideoChange(lecture)}
+																			className="text-blue-600 mr-2"
+																		>
+																			{currentVideo?.id === lecture.id ? (
+																				<Pause size={20} />
+																			) : (
+																				<Play size={20} />
+																			)}
+																		</button>
+																	)}
+																	<span
+																		className={
+																			!lecture.preview ? "text-gray-400" : ""
+																		}
+																	>
+																		{lecture?.title}
+																	</span>
+																</div>
+																<div className="flex items-center">
+																	<span className="text-sm text-gray-500 mr-2">
+																		{lecture.duration}
+																	</span>
+																	<button
+																		disabled={!lecture.preview}
+																		onClick={() =>
+																			handleToggleCompleted(lecture.id)
+																		}
+																		className={`w-6 h-6 rounded-full border ${
+																			completedLectures.has(lecture.id)
+																				? "bg-green-500 border-green-500"
+																				: "border-gray-300"
+																		} flex items-center justify-center`}
+																	>
+																		{completedLectures.has(lecture.id) && (
+																			<CheckCircle
+																				className="text-white"
+																				size={16}
+																			/>
+																		)}
+																	</button>
+																</div>
+															</div>
+														)
+													)}
+												</div>
+											)}
+										</div>
+									))}
+								</div>
+							)}
+							{activeTab === "notes" && (
+								<div>
+									<div className="flex justify-between items-center mb-4">
+										<h2 className="text-xl font-semibold">
+											Notes for: {currentVideo?.title}
+										</h2>
+										<button
+											onClick={() => setShowNoteModal(true)}
+											className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+										>
+											Add Note <Edit className="inline-block ml-1" size={16} />
+										</button>
+									</div>
+									{notes.map((note) => (
+										<div
+											key={note.id}
+											className="bg-white p-4 rounded-lg shadow mb-4"
+										>
+											<h3 className="font-semibold mb-2">{note.title}</h3>
+											<p className="text-gray-600 mb-4">{note.content}</p>
+											<div className="flex space-x-2">
+												<button
+													onClick={() => handleEditNote(note)}
+													className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600"
+												>
+													<Edit className="inline-block mr-1" size={16} /> Edit
+												</button>
+												<button
+													onClick={() => handleDeleteNote(note.id)}
+													className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+												>
+													<Trash2 className="inline-block mr-1" size={16} />{" "}
+													Delete
+												</button>
+											</div>
+										</div>
+									))}
+								</div>
+							)}
+							{activeTab === "discussion" && (
+								<div>
+									<div className="mb-4">
+										<input
+											type="text"
+											placeholder="Search discussions..."
+											className="w-full p-2 border rounded-md"
+										/>
+									</div>
+									<button
+										onClick={() => setShowAskQuestionModal(true)}
+										className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 mb-4"
+									>
+										Ask Question
+									</button>
+									{discussions.map((discussion) => (
+										<div
+											key={discussion.id}
+											className="bg-white p-4 rounded-lg shadow mb-4"
+										>
+											<div className="flex items-center mb-2">
+												<img
+													src={discussion.avatar}
+													alt={`${discussion.user} Avatar`}
+													className="w-10 h-10 rounded-full mr-2"
+												/>
+												<div>
+													<h3 className="font-semibold">{discussion.user}</h3>
+													<p className="text-sm text-gray-500">
+														Asked {discussion.time}
+													</p>
+												</div>
+											</div>
+											<h4 className="font-semibold mb-2">
+												{discussion.question}
+											</h4>
+											<button
+												onClick={() => handleJoinConversation(discussion)}
+												className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700"
+											>
+												Join Conversation{" "}
+												<MessageSquare
+													className="inline-block ml-1"
+													size={16}
+												/>
+											</button>
+										</div>
+									))}
+								</div>
+							)}
+							{activeTab === "review" && (
+								<div>
+									<h2 className="text-xl font-semibold mb-4">Leave a Review</h2>
+									<form>
+										<div className="mb-4">
+											<label className="block text-sm font-medium mb-1">
+												Rating
+											</label>
+											<select className="w-full p-2 border rounded-md">
+												<option value="5">★★★★★ (5/5)</option>
+												<option value="4">★★★★☆ (4/5)</option>
+												<option value="3">★★★☆☆ (3/5)</option>
+												<option value="2">★★☆☆☆ (2/5)</option>
+												<option value="1">★☆☆☆☆ (1/5)</option>
+											</select>
+										</div>
+										<div className="mb-4">
+											<label className="block text-sm font-medium mb-1">
+												Your review
+											</label>
+											<textarea
+												className="w-full p-2 border rounded-md"
+												rows={4}
+												placeholder="Write your review here..."
+											></textarea>
+										</div>
+										<button
+											type="submit"
+											className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+										>
+											Post Review
+										</button>
+									</form>
+								</div>
+							)}
+						</>
+					)}
+				</div>
+			</div>
+
+			<Modal
+				isOpen={showNoteModal}
+				onClose={() => setShowNoteModal(false)}
+				title="Add New Note"
+			>
+				<form onSubmit={handleAddNote}>
+					<div className="mb-4">
+						<label
+							htmlFor="title"
+							className="block text-sm font-medium text-gray-700"
+						>
+							Note Title
+						</label>
+						<input
+							type="text"
+							id="title"
+							name="title"
+							required
+							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+						/>
+					</div>
+					<div className="mb-4">
+						<label
+							htmlFor="content"
+							className="block text-sm font-medium text-gray-700"
+						>
+							Note Content
+						</label>
+						<textarea
+							id="content"
+							name="content"
+							rows="3"
+							required
+							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+						></textarea>
+					</div>
+					<div className="flex justify-end">
+						<button
+							type="button"
+							onClick={() => setShowNoteModal(false)}
+							className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+						>
+							Cancel
+						</button>
+						<button
+							type="submit"
+							className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+						>
+							Save Note
+						</button>
+					</div>
+				</form>
+			</Modal>
+
+			<Modal
+				isOpen={showEditNoteModal}
+				onClose={() => setShowEditNoteModal(false)}
+				title="Edit Note"
+			>
+				<form onSubmit={handleUpdateNote}>
+					<div className="mb-4">
+						<label
+							htmlFor="title"
+							className="block text-sm font-medium text-gray-700"
+						>
+							Note Title
+						</label>
+						<input
+							type="text"
+							id="title"
+							name="title"
+							required
+							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+							defaultValue={editingNote?.title}
+						/>
+					</div>
+					<div className="mb-4">
+						<label
+							htmlFor="content"
+							className="block text-sm font-medium text-gray-700"
+						>
+							Note Content
+						</label>
+						<textarea
+							id="content"
+							name="content"
+							rows="3"
+							required
+							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+							defaultValue={editingNote?.content}
+						></textarea>
+					</div>
+					<div className="flex justify-end">
+						<button
+							type="button"
+							onClick={() => setShowEditNoteModal(false)}
+							className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+						>
+							Cancel
+						</button>
+						<button
+							type="submit"
+							className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+						>
+							Save Changes
+						</button>
+					</div>
+				</form>
+			</Modal>
+
+			<Modal
+				isOpen={showAskQuestionModal}
+				onClose={() => setShowAskQuestionModal(false)}
+				title="Ask New Question"
+			>
+				<form onSubmit={handleAskQuestion}>
+					<div className="mb-4">
+						<label
+							htmlFor="question"
+							className="block text-sm font-medium text-gray-700"
+						>
+							What's your question?
+						</label>
+						<textarea
+							id="question"
+							name="question"
+							rows="3"
+							required
+							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+						></textarea>
+					</div>
+					<div className="flex justify-end">
+						<button
+							type="button"
+							onClick={() => setShowAskQuestionModal(false)}
+							className="mr-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+						>
+							Close
+						</button>
+						<button
+							type="submit"
+							className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+						>
+							Post Question
+						</button>
+					</div>
+				</form>
+			</Modal>
+
+			<Modal
+				isOpen={showJoinConversationModal}
+				onClose={() => setShowJoinConversationModal(false)}
+				title="Join Conversation"
+			>
+				<div className="mb-4 max-h-60 overflow-y-auto custom-scrollbar">
+					<div className="flex mb-4">
+						<img
+							src={selectedDiscussion?.avatar}
+							alt="User Avatar"
+							className="w-10 h-10 rounded-full mr-2"
+						/>
+						<div>
+							<h6 className="font-semibold">{selectedDiscussion?.user}</h6>
+							<p className="text-sm text-gray-500">
+								{selectedDiscussion?.time}
+							</p>
+							<p className="mt-1">{selectedDiscussion?.question}</p>
+						</div>
+					</div>
+					{selectedDiscussion?.replies.map((reply) => (
+						<div key={reply.id} className="flex mb-4 ml-8">
+							<img
+								src={reply.avatar}
+								alt="User Avatar"
+								className="w-8 h-8 rounded-full mr-2"
+							/>
+							<div>
+								<h6 className="font-semibold">{reply.user}</h6>
+								<p className="text-sm text-gray-500">{reply.time}</p>
+								<p className="mt-1">{reply.content}</p>
+							</div>
+						</div>
+					))}
+				</div>
+				<form onSubmit={handleReply}>
+					<div className="mb-4">
+						<label
+							htmlFor="reply"
+							className="block text-sm font-medium text-gray-700"
+						>
+							Your reply
+						</label>
+						<textarea
+							id="reply"
+							name="reply"
+							rows="3"
+							required
+							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+							placeholder="What's your reply?"
+						></textarea>
+					</div>
+					<div className="flex justify-end">
+						<button
+							type="submit"
+							className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+						>
+							Post Reply
+						</button>
+					</div>
+				</form>
+			</Modal>
+		</div>
+	);
 }
-
-export default CourseDetail

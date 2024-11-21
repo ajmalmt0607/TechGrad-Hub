@@ -23,9 +23,17 @@ import Search from "./views/base/Search";
 import Layout from "./views/student/Partials/Layout";
 import NotFound from "./views/base/NotFound";
 import StudentChangePassword from "./views/student/ChangePassword";
+import { initializeAuth } from "./utils/initializeAuth";
+import StudentCourses from "./views/student/Courses";
+import StudentCoursesDetail from "./views/student/CourseDetail";
 
 function App() {
 	const [cartCount, setCartCount] = useState(0);
+
+	// Move initializeAuth to useEffect
+	useEffect(() => {
+		initializeAuth();
+	}, []);
 
 	useEffect(() => {
 		apiInstance.get(`course/cart-list/${CartId()}/`).then((res) => {
@@ -40,6 +48,11 @@ function App() {
 					{/* Protected Routes for Students */}
 					<Route path="/student" element={<Layout />}>
 						<Route path="dashboard" element={<Dashboard />} />
+						<Route path="courses" element={<StudentCourses />} />
+						<Route
+							path="courses/:enrollment_id/"
+							element={<StudentCoursesDetail />}
+						/>
 						<Route path="change-password" element={<StudentChangePassword />} />
 
 						{/* Catch-all route for unmatched paths */}

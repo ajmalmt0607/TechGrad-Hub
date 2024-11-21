@@ -9,15 +9,18 @@ import {
 	Edit,
 } from "lucide-react";
 import useSidebarStore from "../../../store/sidebar"; // Import the store
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { CgPassword } from "react-icons/cg";
 import { GoSignOut } from "react-icons/go";
 
 export function Sidebar() {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const [isLearningOpen, setIsLearningOpen] = useState(false); // State to handle dropdown toggle
-	const setSelectedView = useSidebarStore((state) => state.setSelectedView);
-	const location = useLocation(); // Get current route path
+
+	const { selectedView, setSelectedView } = useSidebarStore((state) => ({
+		selectedView: state.selectedView,
+		setSelectedView: state.setSelectedView,
+	}));
 
 	// Function to toggle sidebar visibility
 	const toggleSidebar = () => {
@@ -58,14 +61,14 @@ export function Sidebar() {
 								to="/student/dashboard"
 								onClick={() => handleNavigation("Dashboard")}
 								className={`w-full text-left p-3 flex items-center rounded-md ${
-									location.pathname === "/student/dashboard"
+									selectedView === "Dashboard"
 										? "bg-blue-100 text-blue-500 border-l-4 border-blue-500"
 										: "hover:bg-gray-100 text-gray-700 border-l-4 border-transparent"
 								}`}
 							>
 								<Home
 									className={`mr-4 h-5 w-5 ${
-										location.pathname === "/student/dashboard"
+										selectedView === "Dashboard"
 											? "text-blue-500"
 											: "text-gray-700"
 									}`}
@@ -76,17 +79,17 @@ export function Sidebar() {
 
 						<li>
 							<Link
-								to="/student/my-courses"
+								to="/student/courses"
 								onClick={() => handleNavigation("MyCourses")}
 								className={`w-full text-left p-3 flex items-center rounded-md ${
-									location.pathname === "/student/my-courses"
+									selectedView === "MyCourses"
 										? "bg-blue-100 text-blue-500 border-l-4 border-blue-500"
 										: "hover:bg-gray-100 text-gray-700 border-l-4 border-transparent"
 								}`}
 							>
 								<BookOpen
 									className={`mr-4 h-5 w-5 ${
-										location.pathname === "/student/my-courses"
+										selectedView === "MyCourses"
 											? "text-blue-500"
 											: "text-gray-700"
 									}`}
@@ -100,14 +103,14 @@ export function Sidebar() {
 								to="/student/wishlist"
 								onClick={() => handleNavigation("Wishlist")}
 								className={`w-full text-left p-3 flex items-center rounded-md ${
-									location.pathname === "/student/wishlist"
+									selectedView === "Wishlist"
 										? "bg-blue-100 text-blue-500 border-l-4 border-blue-500"
 										: "hover:bg-gray-100 text-gray-700 border-l-4 border-transparent"
 								}`}
 							>
 								<Heart
 									className={`mr-4 h-5 w-5 ${
-										location.pathname === "/student/wishlist"
+										selectedView === "Wishlist"
 											? "text-blue-500"
 											: "text-gray-700"
 									}`}
@@ -137,7 +140,7 @@ export function Sidebar() {
 											to="/student/syllabus"
 											onClick={() => handleNavigation("Syllabus")}
 											className={`w-full text-left p-3 flex items-center rounded-md ${
-												location.pathname === "/student/syllabus"
+												selectedView === "Syllabus"
 													? "bg-blue-100 text-blue-500 border-l-4 border-blue-500"
 													: "hover:bg-gray-100 text-gray-700 border-l-4 border-transparent"
 											}`}
@@ -151,7 +154,7 @@ export function Sidebar() {
 											to="/student/change-password"
 											onClick={() => handleNavigation("ChangePassword")}
 											className={`w-full text-left p-3 flex items-center rounded-md ${
-												location.pathname === "/student/change-password"
+												selectedView === "ChangePassword"
 													? "bg-blue-100 text-blue-500 border-l-4 border-blue-500"
 													: "hover:bg-gray-100 text-gray-700 border-l-4 border-transparent"
 											}`}
@@ -165,7 +168,7 @@ export function Sidebar() {
 											to="/student/workshops"
 											onClick={() => handleNavigation("Workshops")}
 											className={`w-full text-left p-3 flex items-center rounded-md ${
-												location.pathname === "/student/workshops"
+												selectedView === "Workshops"
 													? "bg-blue-100 text-blue-500 border-l-4 border-blue-500"
 													: "hover:bg-gray-100 text-gray-700 border-l-4 border-transparent"
 											}`}
@@ -177,8 +180,6 @@ export function Sidebar() {
 								</ul>
 							)}
 						</li>
-
-						{/* Add more dropdowns or links here */}
 					</ul>
 				</nav>
 			</div>

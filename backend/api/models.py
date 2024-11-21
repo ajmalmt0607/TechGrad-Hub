@@ -166,8 +166,8 @@ class VariantItem(models.Model):
     variant = models.ForeignKey(Variant, on_delete=models.CASCADE, related_name="variant_items")
     title = models.CharField(max_length=1000)
     description = models.TextField(null=True, blank=True)
-    file = models.FileField(upload_to="course-file", null=True, blank=True)
-    duration = models.DurationField(null=True, blank=True)
+    url = models.URLField(max_length=2000, null=True, blank=True)  # External video URL
+    duration = models.CharField(max_length=100, null=True, blank=True)  # Pre-calculated duration
     content_duration = models.CharField(max_length=1000, null=True, blank=True)
     preview = models.BooleanField(default=False)
     variant_item_id = ShortUUIDField(unique=True, length=6, max_length=20, alphabet="1234567890")
@@ -176,23 +176,6 @@ class VariantItem(models.Model):
     def __str__(self):
         return f"{self.variant.title} - {self.title}"
     
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        if self.file:
-            clip = VideoFileClip(self.file.path)
-            duration_seconds = clip.duration
-            
-            # divmod is python inbuilt funciton that two numbers as arguments and return tuple containing two values
-            minutes, reminder = divmod(duration_seconds, 60) # eg. 3600/60 = 60 is minutes, 0 is reminder
-            minutes = math.floor(minutes)
-            seconds = math.floor(reminder)
-
-            duration_text = f"{minutes}m {seconds}s" #60m 35s
-            self.content_duration = duration_text
-
-            # Here we saying updated field 'content_duration' update during save
-            super().save(update_fields=['content_duration'])
 
 class Question_Answer(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)

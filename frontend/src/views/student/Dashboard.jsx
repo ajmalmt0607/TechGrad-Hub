@@ -1,32 +1,83 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Book, CheckCircle, Award } from "lucide-react";
-
-const courses = [
-	{
-		id: 1,
-		title: "The Python Course: build web application",
-		level: "Beginner",
-		language: "French",
-		enrolled: "Feb 28, 2024",
-		lectures: 1,
-		completed: 0,
-		progress: 0,
-		image: "/placeholder.svg?height=100&width=200",
-	},
-	{
-		id: 2,
-		title: "Node.js Tutorials - For beginners and professionals",
-		level: "Advanced",
-		language: "English",
-		enrolled: "Feb 28, 2024",
-		lectures: 11,
-		completed: 3,
-		progress: 27,
-		image: "/placeholder.svg?height=100&width=200",
-	},
-];
+import moment from "moment";
+import UserData from "../plugins/UserData";
+import useAxios from "../../utils/useAxios";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
+	const [courses, setCourses] = useState([]);
+	const [stats, setStats] = useState([]);
+	const [fetching, setFetching] = useState(true);
+
+	const fetchData = () => {
+		setFetching(true);
+		useAxios()
+			.get(`student/summary/${UserData()?.user_id}/`)
+			.then((res) => {
+				console.log(res.data[0]);
+				setStats(res.data[0]);
+				console.log(stats);
+			});
+
+		useAxios()
+			.get(`student/course-list/${UserData()?.user_id}/`)
+			.then((res) => {
+				console.log(res.data);
+				setCourses(res.data);
+				setFetching(false);
+			});
+	};
+
+	useEffect(() => {
+		fetchData();
+	}, []);
+
+	const handleSearch = (event) => {
+		const query = event.target.value.toLowerCase();
+		console.log(query);
+		if (query === "") {
+			fetchData();
+		} else {
+			const filteredCourses = courses.filter((c) => {
+				return c.course.title.toLowerCase().includes(query);
+			});
+			setCourses(filteredCourses);
+		}
+	};
+
+	// Skeleton for tbody rows
+	const SkeletonRow = () => (
+		<tr className="animate-pulse">
+			<td className="px-6 py-4">
+				<div className="flex items-center">
+					<Skeleton circle height={40} width={40} />
+					<div className="ml-4">
+						<Skeleton width={200} height={20} />
+						<Skeleton width={100} height={16} className="mt-2" />
+					</div>
+				</div>
+			</td>
+			<td className="px-6 py-4">
+				<Skeleton width={80} height={20} />
+			</td>
+			<td className="px-6 py-4 text-center">
+				<Skeleton width={50} height={20} />
+			</td>
+			<td className="px-6 py-4 text-center">
+				<Skeleton width={50} height={20} />
+			</td>
+			<td className="px-6 py-4">
+				<Skeleton width="100%" height={10} />
+			</td>
+			<td className="px-6 py-4">
+				<Skeleton width={80} height={30} />
+			</td>
+		</tr>
+	);
+
 	return (
 		<div className="space-y-8">
 			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -55,21 +106,23 @@ export default function Dashboard() {
 						<h3 className="text-lg font-semibold">Total Courses</h3>
 						<Book className="h-6 w-6 text-purple-600 dark:text-purple-400" />
 					</div>
-					<p className="text-3xl font-bold mt-2">2</p>
+					<p className="text-3xl font-bold mt-2">{stats.total_courses}</p>
 				</div>
 				<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
 					<div className="flex items-center justify-between">
-						<h3 className="text-lg font-semibold">Complete Lessons</h3>
+						<h3 className="text-lg font-semibold">Completed Lessons</h3>
 						<CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
 					</div>
-					<p className="text-3xl font-bold mt-2">3</p>
+					<p className="text-3xl font-bold mt-2">{stats.completed_lessons}</p>
 				</div>
 				<div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
 					<div className="flex items-center justify-between">
 						<h3 className="text-lg font-semibold">Achieved Certificates</h3>
 						<Award className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
 					</div>
-					<p className="text-3xl font-bold mt-2">0</p>
+					<p className="text-3xl font-bold mt-2">
+						{stats.achieved_certificates}
+					</p>
 				</div>
 			</div>
 
@@ -93,6 +146,7 @@ export default function Dashboard() {
 							type="search"
 							placeholder="Search Your Courses"
 							className="w-full pl-10 pr-4  py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+							onChange={handleSearch}
 						/>
 						<Search
 							className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -125,54 +179,79 @@ export default function Dashboard() {
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-							{courses.map((course) => (
-								<tr key={course.id}>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="flex items-center">
-											<img
-												className="h-10 w-10 rounded-full"
-												src={course.image}
-												alt=""
-											/>
-											<div className="ml-4">
-												<div className="text-sm font-medium text-gray-900 dark:text-white">
-													{course.title}
-												</div>
-												<div className="text-sm text-gray-500 dark:text-gray-400">
-													<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
-														{course.level}
-													</span>
-													<span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-														{course.language}
-													</span>
+							{/* Show Skeleton Rows when fetching */}
+							{fetching &&
+								[...Array(5)].map((_, index) => <SkeletonRow key={index} />)}
+							{!fetching &&
+								courses?.map((c, index) => (
+									<tr key={index}>
+										<td className="px-6 py-4 whitespace-nowrap">
+											<div className="flex items-center">
+												<img
+													className="h-10 w-10 rounded-full"
+													src={c.course.image}
+													alt="course-image"
+												/>
+												<div className="ml-4">
+													<div className="text-sm font-medium text-gray-900 dark:text-white">
+														{c.course.title}
+													</div>
+													<div className="text-sm text-gray-500 dark:text-gray-400">
+														<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+															{c.course.level}
+														</span>
+														<span className="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+															{c.course.language}
+														</span>
+													</div>
 												</div>
 											</div>
-										</div>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-left text-sm text-gray-500 dark:text-gray-400">
-										{course.enrolled}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500 dark:text-gray-400">
-										{course.lectures}
-									</td>
-									<td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-										{course.completed}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-											<div
-												className="bg-purple-600 h-2.5 rounded-full dark:bg-purple-500"
-												style={{ width: `${course.progress}%` }}
-											></div>
-										</div>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-										<button className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300">
-											Continue
-										</button>
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-left text-sm text-gray-500 dark:text-gray-400">
+											{moment(c.date).format("DD MMM YYYY")}
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500 dark:text-gray-400">
+											{c.lectures?.length}
+										</td>
+										<td className="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+											{c.completed_lesson?.length}
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap">
+											<div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+												<div
+													className="bg-purple-600 h-2.5 rounded-full dark:bg-purple-500"
+													style={{ width: `${27}%` }}
+												></div>
+											</div>
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+											{c.completed_lesson?.length < 1 && (
+												<Link
+													to={`/student/courses/${c.enrollment_id}/`}
+													className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+												>
+													Start
+												</Link>
+											)}
+											{c.completed_lesson?.length > 0 && (
+												<Link
+													to={`/student/courses/${c.enrollment_id}/`}
+													className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+												>
+													Continue
+												</Link>
+											)}
+										</td>
+									</tr>
+								))}
+
+							{courses?.length < 1 && (
+								<tr>
+									<td className="px-6 font-medium py-6 text-center" colSpan="6">
+										No courses found...
 									</td>
 								</tr>
-							))}
+							)}
 						</tbody>
 					</table>
 				</div>

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { CartContext } from "../plugins/Context";
 import logo from "../../assets/techgrad.svg";
+import { userAuthStore } from "../../store/auth";
 
 export default function BaseHeader() {
 	const [cartCount, setCartCount] = useContext(CartContext);
@@ -38,6 +39,13 @@ export default function BaseHeader() {
 		document.addEventListener("click", closeDropdowns);
 		return () => document.removeEventListener("click", closeDropdowns);
 	}, []);
+
+	const [isLoggedIn, user] = userAuthStore((state) => [
+		state.isLoggedIn,
+		state.user,
+	]);
+
+	console.log(isLoggedIn());
 
 	return (
 		<header className="bg-white text-gray-900 shadow-sm fixed top-0 left-0 right-0 z-10">
