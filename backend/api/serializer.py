@@ -72,6 +72,14 @@ class VariantItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.VariantItem
         fields = "__all__"
+    
+    def __init__(self, *args, **kwargs):
+        super(VariantItemSerializer, self ).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
 
 class VariantSerializer(serializers.ModelSerializer):
     variant_items = VariantItemSerializer(many=True)
@@ -79,6 +87,14 @@ class VariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = api_models.Variant
         fields = "__all__"
+    
+    def __init__(self, *args, **kwargs):
+        super(VariantSerializer, self ).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
 
 
 class Question_Answer_MessageSerializer(serializers.ModelSerializer):
@@ -151,6 +167,14 @@ class CompletedLessonSerializer(serializers.ModelSerializer):
         model = api_models.CompletedLesson
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        super(CompletedLessonSerializer, self ).__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request and request.method == "POST":
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 3
+    
 
 class NoteSerializer(serializers.ModelSerializer):
 

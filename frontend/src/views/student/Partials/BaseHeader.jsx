@@ -58,9 +58,9 @@ export default function BaseHeader() {
 					</div>
 
 					{/* Navigation Links (hidden on mobile) */}
-					<nav className="hidden md:flex space-x-4 ml-4">
-						{/* Instructor Dropdown */}
-						<div className="relative">
+					{/* <nav className="hidden md:flex space-x-4 ml-4"> */}
+					{/* Instructor Dropdown */}
+					{/* <div className="relative">
 							<button
 								onClick={() => toggleDropdown("instructor")}
 								className="flex items-center font-medium text-gray-700 hover:text-gray-900 dropdown-toggle"
@@ -121,10 +121,10 @@ export default function BaseHeader() {
 									</Link>
 								</div>
 							)}
-						</div>
+						</div> */}
 
-						{/* Student Dropdown */}
-						<div className="relative">
+					{/* Student Dropdown */}
+					{/* <div className="relative">
 							<button
 								onClick={() => toggleDropdown("student")}
 								className="flex items-center font-medium text-gray-700 hover:text-gray-900 dropdown-toggle"
@@ -167,8 +167,8 @@ export default function BaseHeader() {
 									</Link>
 								</div>
 							)}
-						</div>
-					</nav>
+						</div> */}
+					{/* </nav> */}
 
 					{/* Search Bar, Icons, and Dropdowns */}
 					<div className="flex items-center space-x-4">
