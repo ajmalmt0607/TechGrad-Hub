@@ -100,8 +100,7 @@ export default function Success() {
 
 	return (
 		<>
-			<BaseHeader />
-			<div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 p-4">
+			<div className=" bg-gradient-to-br p-4">
 				<div className="max-w-6xl mx-auto">
 					<div className="flex flex-col gap-8 items-center">
 						{/* Success State */}
@@ -113,18 +112,18 @@ export default function Success() {
 										Enrollment Successful!
 									</h1>
 									<p className="text-gray-600 mb-6">
-										Hey there, your enrollment in the 2 courses was successful.
+										Hey there, your enrollment in to the courses was successful.
 										Visit your{" "}
 										<Link
-											to="/my-courses"
+											to="/student/dashboard"
 											className="text-indigo-600 hover:underline"
 										>
-											My Courses
+											Dashboard
 										</Link>{" "}
 										page to view the courses now.
 									</p>
 									<Link
-										to="/my-courses"
+										to="/student/courses"
 										className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
 									>
 										View Enrolled Courses{" "}

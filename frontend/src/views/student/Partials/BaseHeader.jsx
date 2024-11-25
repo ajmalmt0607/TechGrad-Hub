@@ -47,7 +47,7 @@ export default function BaseHeader() {
 	console.log(isLoggedIn());
 
 	return (
-		<header className="bg-white text-gray-900 shadow-sm fixed top-0 left-0 right-0 z-10">
+		<header className="bg-white text-gray-900 shadow-sm fixed border-b top-0 left-0 right-0 z-10">
 			<div className="max-w-full mx-auto px-4">
 				<div className="flex justify-between items-center h-16">
 					{/* Logo */}
@@ -56,119 +56,6 @@ export default function BaseHeader() {
 							<img src={logo} alt="Logo" className="h-14 w-auto" />
 						</Link>
 					</div>
-
-					{/* Navigation Links (hidden on mobile) */}
-					{/* <nav className="hidden md:flex space-x-4 ml-4"> */}
-					{/* Instructor Dropdown */}
-					{/* <div className="relative">
-							<button
-								onClick={() => toggleDropdown("instructor")}
-								className="flex items-center font-medium text-gray-700 hover:text-gray-900 dropdown-toggle"
-							>
-								Instructor <ChevronDown className="ml-1 h-4 w-4" />
-							</button>
-							{openDropdown === "instructor" && (
-								<div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
-									<Link
-										to="/instructor/dashboard/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										<Grid className="inline-block mr-2 h-4 w-4" /> Dashboard
-									</Link>
-									<Link
-										to="/instructor/courses/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										<ShoppingCart className="inline-block mr-2 h-4 w-4" /> My
-										Courses
-									</Link>
-									<Link
-										to="/instructor/create-course/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										Create Course
-									</Link>
-									<Link
-										to="/instructor/reviews/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										Reviews
-									</Link>
-									<Link
-										to="/instructor/question-answer/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										Q/A
-									</Link>
-									<Link
-										to="/instructor/students/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										<User className="inline-block mr-2 h-4 w-4" /> Students
-									</Link>
-									<Link
-										to="/instructor/earning/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										<DollarSign className="inline-block mr-2 h-4 w-4" /> Earning
-									</Link>
-									<Link
-										to="/instructor/profile/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										<Settings className="inline-block mr-2 h-4 w-4" /> Settings
-										& Profile
-									</Link>
-								</div>
-							)}
-						</div> */}
-
-					{/* Student Dropdown */}
-					{/* <div className="relative">
-							<button
-								onClick={() => toggleDropdown("student")}
-								className="flex items-center font-medium text-gray-700 hover:text-gray-900 dropdown-toggle"
-							>
-								Student <ChevronDown className="ml-1 h-4 w-4" />
-							</button>
-							{openDropdown === "student" && (
-								<div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
-									<Link
-										to="/student/dashboard/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										<Grid className="inline-block mr-2 h-4 w-4" /> Dashboard
-									</Link>
-									<Link
-										to="/student/courses/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										<ShoppingCart className="inline-block mr-2 h-4 w-4" /> My
-										Courses
-									</Link>
-									<Link
-										to="/student/wishlist/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										<Heart className="inline-block mr-2 h-4 w-4" /> Wishlist
-									</Link>
-									<Link
-										to="/student/question-answer/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										Q/A
-									</Link>
-									<Link
-										to="/student/profile/"
-										className="block px-4 py-2 hover:bg-gray-100"
-									>
-										<Settings className="inline-block mr-2 h-4 w-4" /> Profile &
-										Settings
-									</Link>
-								</div>
-							)}
-						</div> */}
-					{/* </nav> */}
 
 					{/* Search Bar, Icons, and Dropdowns */}
 					<div className="flex items-center space-x-4">
@@ -197,9 +84,10 @@ export default function BaseHeader() {
 
 						{/* Cart Icon with Dropdown */}
 						<div className="relative">
-							<button
+							<Link
+								to="cart"
 								onClick={() => toggleDropdown("cart")}
-								className="p-2 text-gray-600 hover:bg-gray-100 rounded-full dropdown-toggle"
+								className="p-2 text-gray-600 hover:bg-gray-100 rounded-full block dropdown-toggle"
 							>
 								<ShoppingCart className="h-5 w-5" />
 								{cartCount > 0 && (
@@ -207,24 +95,7 @@ export default function BaseHeader() {
 										{cartCount}
 									</span>
 								)}
-							</button>
-							{openDropdown === "cart" && (
-								<div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
-									<span className="block px-4 py-2 font-bold">
-										Cart ({cartCount})
-									</span>
-									<hr />
-									<Link
-										to="/cart/"
-										className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-									>
-										View Cart
-									</Link>
-									<button className="block w-full text-left px-4 py-2 hover:bg-gray-100">
-										Checkout
-									</button>
-								</div>
-							)}
+							</Link>
 						</div>
 
 						{/* User Icon and Login/Register Dropdown */}

@@ -83,6 +83,7 @@ const ContentSection = memo(
 		currentlyPlayingLecture,
 		isPlaying,
 		isLoading,
+		fetchCourseDetail,
 	}) => {
 		const [expandedSections, setExpandedSections] = useState({});
 
@@ -588,18 +589,25 @@ const CourseDetail = () => {
 				(res.data.completed_lesson?.length / res.data.lectures?.length) * 100;
 			setCompletionPercentage(percentageCompleted?.toFixed(0));
 			// Set initial expanded section and selected lecture
-			if (res.data.curriculum && res.data.curriculum.length > 0) {
-				const firstSection = res.data.curriculum[0];
+			// if (
+			// 	res.data.curriculum &&
+			// 	res.data.curriculum.length > 0 &&
+			// 	variantItem === null &&
+			// 	currentlyPlayingLecture === null
+			// ) {
+			// 	const firstSection = res.data.curriculum[0];
 
-				if (
-					firstSection.variant_items &&
-					firstSection.variant_items.length > 0
-				) {
-					const firstLecture = firstSection.variant_items[0];
-					setVariantItem(firstLecture);
-					setCurrentlyPlayingLecture(firstLecture);
-				}
-			}
+			// 	if (
+			// 		firstSection.variant_items &&
+			// 		firstSection.variant_items.length > 0 &&
+			// 		variantItem === null &&
+			// 		currentlyPlayingLecture === null
+			// 	) {
+			// 		const firstLecture = firstSection.variant_items[0];
+			// 		setVariantItem(firstLecture);
+			// 		setCurrentlyPlayingLecture(firstLecture);
+			// 	}
+			// }
 		} catch (error) {
 			console.error("Error fetching course details:", error);
 			Toast().fire({
@@ -802,7 +810,10 @@ const CourseDetail = () => {
 					formdata
 				);
 				setSelectedConversation(res.data.question);
+				console.log(res.data.question);
+
 				setCreateMessage({ title: "", message: "" });
+				fetchCourseDetail();
 			} catch (error) {
 				console.error("Error sending message:", error);
 				Toast().fire({
@@ -811,7 +822,12 @@ const CourseDetail = () => {
 				});
 			}
 		},
-		[course.course?.id, createMessage.message, selectedConversation?.qa_id]
+		[
+			course.course?.id,
+			createMessage.message,
+			selectedConversation?.qa_id,
+			fetchCourseDetail,
+		]
 	);
 
 	useEffect(() => {
@@ -959,6 +975,7 @@ const CourseDetail = () => {
 				lastElementRef={lastElementRef}
 				currentlyPlayingLecture={currentlyPlayingLecture}
 				isPlaying={isPlaying}
+				fetchCourseDetail={fetchCourseDetail}
 			/>
 		</div>
 	);

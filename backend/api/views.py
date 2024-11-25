@@ -130,7 +130,16 @@ class ChangePasswordAPIView(generics.CreateAPIView):
             else:
                 return Response({"message": "Old password is incorrect", "icon":"warning"}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"message": "User Does Not Exist", "icon":"error"}, status=status.HTTP_404_NOT_FOUND)  
+            return Response({"message": "User Does Not Exist", "icon":"error"}, status=status.HTTP_404_NOT_FOUND)
+
+class ProfileAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = api_serializer.ProfileSerializer
+    permission_classes = [AllowAny]
+
+    def get_object(self):
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+        return Profile.objects.get(user=user)  
 
 class CategoryListAPIView(generics.ListAPIView):
     # when evere we use the ListAPIView we need to know that we try to retrieve a list of items from the database

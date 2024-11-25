@@ -7,6 +7,8 @@ import {
 	ChevronDown,
 	Settings,
 	Edit,
+	GraduationCap,
+	GlobeIcon,
 } from "lucide-react";
 import useSidebarStore from "../../../store/sidebar"; // Import the store
 import { Link } from "react-router-dom";
@@ -100,6 +102,27 @@ export function Sidebar() {
 
 						<li>
 							<Link
+								to="/student/courses-list"
+								onClick={() => handleNavigation("Discover")}
+								className={`w-full text-left p-3 flex items-center rounded-md ${
+									selectedView === "Discover"
+										? "bg-blue-100 text-blue-500 border-l-4 border-blue-500"
+										: "hover:bg-gray-100 text-gray-700 border-l-4 border-transparent"
+								}`}
+							>
+								<GlobeIcon
+									className={`mr-4 h-5 w-5 ${
+										selectedView === "Discover"
+											? "text-blue-500"
+											: "text-gray-700"
+									}`}
+								/>
+								<span>Discover</span>
+							</Link>
+						</li>
+
+						<li>
+							<Link
 								to="/student/wishlist"
 								onClick={() => handleNavigation("Wishlist")}
 								className={`w-full text-left p-3 flex items-center rounded-md ${
@@ -137,7 +160,7 @@ export function Sidebar() {
 								<ul className="space-y-2 mt-2">
 									<li>
 										<Link
-											to="/student/syllabus"
+											to="/student/edit-profile"
 											onClick={() => handleNavigation("Syllabus")}
 											className={`w-full text-left p-3 flex items-center rounded-md ${
 												selectedView === "Syllabus"

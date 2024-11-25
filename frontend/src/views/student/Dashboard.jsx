@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Search, Book, CheckCircle, Award } from "lucide-react";
+import React, { useContext, useEffect, useState } from "react";
+import { Search, Book, CheckCircle, Award, FilePenLine } from "lucide-react";
 import moment from "moment";
 import UserData from "../plugins/UserData";
 import useAxios from "../../utils/useAxios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Link } from "react-router-dom";
+import { ProfileContext } from "../plugins/Context";
 
 export default function Dashboard() {
 	const [courses, setCourses] = useState([]);
 	const [stats, setStats] = useState([]);
 	const [fetching, setFetching] = useState(true);
+	const [profile, setProfile] = useContext(ProfileContext);
+
+	console.log(profile);
 
 	const fetchData = () => {
 		setFetching(true);
@@ -81,16 +85,22 @@ export default function Dashboard() {
 	return (
 		<div className="space-y-8">
 			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-				<div>
-					<h1 className="text-2xl font-bold">Welcome, Mohammed Ajmal</h1>
-					<p className="text-gray-500 dark:text-gray-400">
-						tepu@mailinator.com
-					</p>
+				<div className="flex items-center">
+					<div className="w-12 h-12 mr-2 rounded-full overflow-hidden">
+						<img className="w-full" src={profile.image} alt="" />
+					</div>
+					<div>
+						<h1 className="text-2xl font-bold">{profile.full_name}</h1>
+						<p className="text-gray-500 dark:text-gray-400">{profile.about}</p>
+					</div>
 				</div>
 				<div className="flex flex-wrap gap-2">
-					<button className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600">
-						Create New Course
-					</button>
+					<Link
+						to={"/student/edit-profile"}
+						className="flex px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-900 dark:bg-purple-500 dark:hover:bg-purple-600"
+					>
+						<FilePenLine className="mr-1" /> Edit Profile
+					</Link>
 					<button className="px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-md hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600">
 						Settings
 					</button>
@@ -188,7 +198,7 @@ export default function Dashboard() {
 										<td className="px-6 py-4 whitespace-nowrap">
 											<div className="flex items-center">
 												<img
-													className="h-10 w-10 rounded-full"
+													className="h-10 w-12 rounded"
 													src={c.course.image}
 													alt="course-image"
 												/>

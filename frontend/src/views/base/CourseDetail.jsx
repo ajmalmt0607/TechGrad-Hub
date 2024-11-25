@@ -99,10 +99,9 @@ export default function CourseDetail() {
 
 	return (
 		<>
-			<BaseHeader />
 			<>
-				<div className="bg-gray-50 min-h-screen pt-14">
-					<main className="container mx-auto px-4 py-8 xl:px-40">
+				<div className="min-h-screen max-w-6xl">
+					<main className="container mx-auto ">
 						{isLoading === true ? (
 							<div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
 								<div className="lg:col-span-2">
@@ -516,9 +515,6 @@ export default function CourseDetail() {
 														Added to Cart
 													</button>
 												)}
-												<button className="w-full text-sm bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition duration-300">
-													Enroll Now
-												</button>
 											</div>
 										</div>
 										<div className="mt-6 border-t pt-6">
@@ -585,7 +581,7 @@ export default function CourseDetail() {
 							</div>
 						)}
 
-						<section className="mt-12">
+						{/* <section className="mt-12">
 							<h2 className="text-2xl font-bold mb-6">Related Courses</h2>
 							{isLoading ? (
 								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -658,7 +654,7 @@ export default function CourseDetail() {
 									))}
 								</div>
 							)}
-						</section>
+						</section> */}
 					</main>
 
 					{isVideoModalOpen && (
