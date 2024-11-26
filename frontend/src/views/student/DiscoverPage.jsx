@@ -425,7 +425,7 @@ export default function DiscoverPage() {
 		<main className="min-h-screen">
 			<div className="max-w-7xl mx-auto">
 				{/* Header Section */}
-				<div className="mb-7">
+				<div className="mb-6">
 					<h1 className="text-2xl font-bold text-gray-900 mb-1">
 						Discover Courses
 					</h1>
@@ -496,7 +496,7 @@ export default function DiscoverPage() {
 								className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 ease-in-out flex flex-col"
 							>
 								<Link
-									to={`/student/course-detail/${course.slug}/`}
+									to={`/student/course-detail/${course.slug}`}
 									className="flex-1 flex flex-col"
 								>
 									<div className="relative">
@@ -505,12 +505,12 @@ export default function DiscoverPage() {
 											alt={course.title}
 											className="w-full h-44 object-fill"
 										/>
-										<div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-sm font-semibold text-blue-600">
+										<div className="absolute top-[140px] right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-sm font-semibold text-blue-600">
 											${course.price}
 										</div>
 										<button
 											onClick={(e) => toggleWishlist(course.id, e)}
-											className="absolute top-4 left-4 p-2 bg-white/60 backdrop-blur-xs rounded-full text-blue-600 hover:text-red-700 transition-colors"
+											className="absolute top-4 right-3 p-2 bg-white/60 backdrop-blur-xs rounded-full text-blue-600 hover:text-red-700 transition-colors"
 										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
@@ -632,7 +632,7 @@ export default function DiscoverPage() {
 
 				{/* Pagination */}
 				{!isLoading && totalPages > 1 && (
-					<div className="mt-8 flex justify-center gap-2">
+					<div className="mt-4 flex justify-center gap-2">
 						<button
 							onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
 							disabled={currentPage === 1}

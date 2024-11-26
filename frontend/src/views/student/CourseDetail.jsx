@@ -5,7 +5,14 @@ import VideoPlayer from "./Partials/VideoPlayer";
 import useAxios from "../../utils/useAxios";
 import UserData from "../plugins/UserData";
 import Toast from "../plugins/Toast";
-import { Play, Pause } from "lucide-react";
+import {
+	Play,
+	Pause,
+	FilePenLine,
+	Trash2,
+	MessageCircle,
+	MessageSquare,
+} from "lucide-react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -248,13 +255,13 @@ const ContentSection = memo(
 													}}
 													className="text-blue-500 hover:text-blue-700"
 												>
-													Edit
+													<FilePenLine className="w-5 h-5" />
 												</button>
 												<button
 													onClick={() => handleDeleteNote(note.id)}
 													className="text-red-500 hover:text-red-700"
 												>
-													Delete
+													<Trash2 className="w-5 h-5" />
 												</button>
 											</div>
 										</div>
@@ -318,8 +325,9 @@ const ContentSection = memo(
 													setSelectedConversation(question);
 													setShowConversationModal(true);
 												}}
-												className="text-blue-500 hover:text-blue-700"
+												className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700 transition-colors"
 											>
+												<MessageSquare className="w-5 h-5" />
 												Join Conversation
 											</button>
 										</div>
@@ -932,7 +940,7 @@ const CourseDetail = () => {
 	return (
 		<div className="flex gap-4 flex-col xl:flex-row bg-gray-100">
 			<VideoSection
-				videoSource={variantItem?.url || course?.lectures?.[0]?.url}
+				videoSource={variantItem?.url} //course?.lectures?.[0]?.url
 				onPlayPause={handlePlayPause}
 				isPlaying={isPlaying}
 				title={variantItem?.title}

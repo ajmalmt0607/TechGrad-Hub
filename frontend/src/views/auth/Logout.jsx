@@ -18,7 +18,10 @@ function Logout() {
 							You have been logged out
 						</h1>
 						<p className="text-gray-600 mt-2">
-							Thanks for visiting our website, come back anytime!
+							Thanks for visiting our website, come back anytime!{" "}
+							<Link className="text-blue-600" to={"/"}>
+								Go to Home
+							</Link>
 						</p>
 					</div>
 					<div className="flex space-x-4 mt-6">

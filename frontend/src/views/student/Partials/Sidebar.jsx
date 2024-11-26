@@ -188,10 +188,10 @@ export function Sidebar() {
 									</li>
 									<li>
 										<Link
-											to="/student/workshops"
-											onClick={() => handleNavigation("Workshops")}
+											to="/logout"
+											onClick={() => handleNavigation("logout")}
 											className={`w-full text-left p-3 flex items-center rounded-md ${
-												selectedView === "Workshops"
+												selectedView === "logout"
 													? "bg-blue-100 text-blue-500 border-l-4 border-blue-500"
 													: "hover:bg-gray-100 text-gray-700 border-l-4 border-transparent"
 											}`}

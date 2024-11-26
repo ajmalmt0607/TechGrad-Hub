@@ -24,7 +24,7 @@ body {
 
 .custom-scrollbar {
 	scrollbar-width: thin;
-	scrollbar-color: #044dca #ffffff;
+	scrollbar-color: #b3c0d5 #ffffff;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

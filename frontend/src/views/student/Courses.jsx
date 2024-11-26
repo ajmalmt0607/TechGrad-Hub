@@ -4,6 +4,7 @@ import moment from "moment";
 
 import UserData from "../plugins/UserData";
 import useAxios from "../../utils/useAxios";
+import { Link } from "react-router-dom";
 
 export default function Courses() {
 	const [courses, setCourses] = useState([]);
@@ -157,16 +158,35 @@ export default function Courses() {
 												<div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
 													<div
 														className="bg-purple-600 h-2.5 rounded-full dark:bg-purple-500"
-														style={{ width: `${27}%` }}
+														style={{
+															width: `${
+																c.lectures?.length > 0
+																	? (c.completed_lesson?.length /
+																			c.lectures?.length) *
+																		100
+																	: 0
+															}%`,
+														}}
 													></div>
 												</div>
 											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-												<button className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300">
-													{c.completed_lesson?.length > 0
-														? "Continue"
-														: "Start"}
-												</button>
+											<td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+												{c.completed_lesson?.length < 1 && (
+													<Link
+														to={`/student/courses/${c.enrollment_id}/`}
+														className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+													>
+														Start
+													</Link>
+												)}
+												{c.completed_lesson?.length > 0 && (
+													<Link
+														to={`/student/courses/${c.enrollment_id}/`}
+														className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+													>
+														Continue
+													</Link>
+												)}
 											</td>
 										</tr>
 									))}

@@ -605,11 +605,11 @@ export default function HomePage() {
 					</div>
 				</div>
 				<div className="flex items-center space-x-4">
-					<Link href="/login" className="text-gray-700 hover:text-blue-600">
+					<Link to="/login" className="text-gray-700 hover:text-blue-600">
 						Login
 					</Link>
 					<Link
-						href="/join"
+						to="/register"
 						className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
 					>
 						Join Now
@@ -647,7 +647,7 @@ export default function HomePage() {
 					</div>
 
 					{/* Hero Image */}
-					<div className="relative top-10">
+					<div className="relative top-10 ">
 						<div className="w-full h-[400px] relative">
 							<div className="absolute inset-0 flex items-center justify-center">
 								<img

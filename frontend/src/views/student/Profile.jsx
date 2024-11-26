@@ -191,6 +191,10 @@ export default function ModernProfile() {
 			})
 			.then((res) => {
 				console.log(res.data);
+				Toast().fire({
+					icon: "success",
+					title: "Profile updated successfully!",
+				});
 			});
 	};
 

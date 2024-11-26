@@ -51,7 +51,7 @@ function App() {
 		useAxios()
 			.get(`user/profile/${UserData()?.user_id}/`)
 			.then((res) => {
-				setProfile(res.data);
+				setProfile(res?.data);
 			});
 	}, []);
 
@@ -91,7 +91,7 @@ function App() {
 							path="/create-new-password/"
 							element={<CreateNewPassword />}
 						/>
-						<Route path="/course-detail/" element={<CourseDetail />} />
+						{/* <Route path="/course-detail/" element={<CourseDetail />} /> */}
 
 						{/* Base Routes */}
 						<Route path="/" element={<Index />} />

@@ -24,7 +24,7 @@ function Login() {
 			setIsLoading(false);
 			alert(error);
 		} else {
-			navigate("/");
+			navigate("/student/dashboard");
 			setIsLoading;
 		}
 	};

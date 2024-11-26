@@ -3,6 +3,7 @@ import axios from "./axios";
 import jwt_decode from "jwt-decode"; // helps to decode the access and refresh token
 import Cookie from "js-cookie";
 import Swal from "sweetalert2";
+import { Navigate } from "react-router-dom";
 
 export const login = async (email, password) => {
 	try {
