@@ -102,7 +102,7 @@ const ContentSection = memo(
 		}, []);
 
 		return (
-			<div className="w-full lg:w-3/3 xl:max-w-[380px] 2 border-l bg-white h-[550px] overflow-hidden custom-scrollbar flex flex-col">
+			<div className="w-full lg:w-3/3 xl:max-w-[380px] 2 border-l bg-white h-[550px] flex flex-col">
 				<div className="flex border-b">
 					{["Lectures", "Notes", "Discussion", "Review"].map((tab) => (
 						<button
@@ -119,7 +119,7 @@ const ContentSection = memo(
 					))}
 				</div>
 
-				<div className="flex-1 overflow-y-auto">
+				<div className="flex-1 overflow-auto custom-scrollbar">
 					<div className="p-5">
 						{/* Lectures Tab */}
 						{activeTab === "lectures" && (

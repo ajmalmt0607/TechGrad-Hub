@@ -506,7 +506,7 @@ export default function DiscoverPage() {
 											className="w-full h-44 object-fill"
 										/>
 										<div className="absolute top-[140px] right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-sm font-semibold text-blue-600">
-											${course.price}
+											₹{course.price}
 										</div>
 										<button
 											onClick={(e) => toggleWishlist(course.id, e)}

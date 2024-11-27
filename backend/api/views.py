@@ -452,7 +452,7 @@ class StripeCheckoutAPIView(generics.CreateAPIView):
                     }
                 ],
                 mode='payment',
-                success_url=settings.FRONTEND_SITE_URL + '/payment-success/' + order.oid + '?session_id={CHECKOUT_SESSION_ID}',
+                success_url=settings.FRONTEND_SITE_URL + '/student/payment-success/' + order.oid + '?session_id={CHECKOUT_SESSION_ID}',
                 cancel_url=settings.FRONTEND_SITE_URL + '/payment-failed/',
             )
             

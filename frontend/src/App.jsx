@@ -41,19 +41,35 @@ function App() {
 		initializeAuth();
 	}, []);
 
-	useEffect(() => {
-		// Fetching the Cart count
-		apiInstance.get(`course/cart-list/${CartId()}/`).then((res) => {
-			setCartCount(res.data?.length);
-		});
+	const userData = UserData(); // this fetches the user details
+	const cartId = CartId(); // this fetches the cart ID
 
-		// Fetching the User Profile
-		useAxios()
-			.get(`user/profile/${UserData()?.user_id}/`)
-			.then((res) => {
-				setProfile(res?.data);
-			});
-	}, []);
+	useEffect(() => {
+		// Define an asynchronous function inside useEffect
+		const fetchData = async () => {
+			try {
+				// Fetch Cart Count if cartId is available
+				if (cartId) {
+					const cartResponse = await apiInstance.get(
+						`course/cart-list/${cartId}/`
+					);
+					setCartCount(cartResponse.data?.length || 0);
+				}
+
+				// Fetch User Profile if userData is available
+				if (userData?.user_id) {
+					const profileResponse = await apiInstance.get(
+						`user/profile/${userData.user_id}/`
+					);
+					setProfile(profileResponse.data);
+				}
+			} catch (error) {
+				console.error("Error fetching data:", error);
+			}
+		};
+
+		fetchData(); // Call the async function
+	}, [userData, cartId]); // Dependency array to re-run when userData or cartId changes
 
 	return (
 		<CartContext.Provider value={[cartCount, setCartCount]}>

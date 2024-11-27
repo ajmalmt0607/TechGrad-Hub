@@ -464,14 +464,14 @@ export default function ModernCheckout() {
 													{item.course.title}
 												</h3>
 												<p className="text-indigo-600 font-semibold">
-													${item.price}
+													₹{item.price}
 												</p>
 											</div>
 										</div>
 									))}
 								</div>
 								<Link
-									to="/cart"
+									to="/student/cart"
 									className="inline-flex items-center mt-4 text-indigo-600 hover:text-indigo-800"
 								>
 									<Edit2 className="h-4 w-4 mr-1" /> Edit Cart Items
@@ -562,19 +562,19 @@ export default function ModernCheckout() {
 								<div className="space-y-2 mb-6">
 									<div className="flex justify-between text-sm">
 										<span className="text-gray-600">Sub Total</span>
-										<span>${order.sub_total}</span>
+										<span>₹{order.sub_total}</span>
 									</div>
 									<div className="flex justify-between text-sm">
 										<span className="text-gray-600">Discount</span>
-										<span>${order.saved}</span>
+										<span>₹{order.saved}</span>
 									</div>
 									<div className="flex justify-between text-sm">
 										<span className="text-gray-600">Tax</span>
-										<span>${order.tax_fee}</span>
+										<span>₹{order.tax_fee}</span>
 									</div>
 									<div className="flex justify-between text-lg font-semibold border-t pt-2">
 										<span>Total</span>
-										<span>${order.total}</span>
+										<span>₹{order.total}</span>
 									</div>
 								</div>
 

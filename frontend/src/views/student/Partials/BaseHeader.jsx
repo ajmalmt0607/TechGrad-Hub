@@ -16,10 +16,20 @@ import {
 import { CartContext } from "../../plugins/Context";
 import logo from "../../../assets/techgrad.svg";
 import { userAuthStore } from "../../../store/auth";
+import useSidebarStore from "../../../store/sidebar";
 
 export default function BaseHeader() {
 	const [cartCount] = useContext(CartContext);
 	const [openDropdown, setOpenDropdown] = useState(null);
+	const { selectedView, setSelectedView } = useSidebarStore((state) => ({
+		selectedView: state.selectedView,
+		setSelectedView: state.setSelectedView,
+	}));
+
+	// Function to handle navigation and store the selected view
+	const handleNavigation = (view) => {
+		setSelectedView(view); // Update the selected view in the store
+	};
 
 	const toggleDropdown = (dropdownName) => {
 		setOpenDropdown((prevDropdown) =>
@@ -86,7 +96,7 @@ export default function BaseHeader() {
 						<div className="relative">
 							<Link
 								to="cart"
-								onClick={() => toggleDropdown("cart")}
+								onClick={() => handleNavigation("cart")}
 								className="p-2 text-gray-600 hover:bg-gray-100 rounded-full block dropdown-toggle"
 							>
 								<ShoppingCart className="h-5 w-5" />

@@ -344,7 +344,7 @@ export default function ModernCart() {
 													{course.course.title}
 												</h3>
 												<p className="mt-1 text-lg text-indigo-600 font-semibold">
-													${course.price}
+													₹{course.price}
 												</p>
 											</div>
 											<button
@@ -372,18 +372,18 @@ export default function ModernCart() {
 								<div className="flex justify-between">
 									<span className="text-gray-600">Subtotal</span>
 									<span className="font-medium">
-										${cartStats.price?.toFixed(2)}
+										₹{cartStats.price?.toFixed(2)}
 									</span>
 								</div>
 								<div className="flex justify-between">
 									<span className="text-gray-600">Tax</span>
 									<span className="font-medium">
-										${cartStats.tax?.toFixed(2)}
+										₹{cartStats.tax?.toFixed(2)}
 									</span>
 								</div>
 								<div className="flex justify-between text-lg font-bold">
 									<span>Total</span>
-									<span>${cartStats.total?.toFixed(2)}</span>
+									<span>₹{cartStats.total?.toFixed(2)}</span>
 								</div>
 							</div>
 
